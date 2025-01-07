@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Masterverse - Home</title>
+</head>
+<body>
+<h1>Welcome to Masterverse!</h1>
+
+<div th:each="post : ${posts}">
+  <h2 th:text="${post.getUserId().getUsername()}"></h2>
+  <p th:text="${post.getPostContent()}"></p>
+  <div th:each="image : ${postImages}">
+    <img th:src="@{/images/{id}(id=${image.getId()})}" alt="Post image">
+  </div>
+  <small th:text="${{post.getCreatedAt()}}"></small>
+
+  <div th:each="comment : ${post.getComments()}">
+    <p th:text="${comment.getCommentContent()}"></p>
+    <small th:text="${comment.getCreatedAt()}"></small>
+  </div>
+
+  <hr>
+</div>
+</body>
+</html>
