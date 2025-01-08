@@ -21,11 +21,21 @@ public class PostsService
 
     public List<Posts> getAllPosts()
     {
-        return this.iPostsRepository.findAll();
+        return iPostsRepository.findAll();
     }
 
     public List<PostImages> getAllPostImages()
     {
-        return this.iPostImagesRepository.findAll();
+        return iPostImagesRepository.findAll();
+    }
+
+    public Posts getPostsByUserId(long id)
+    {
+        return iPostsRepository.findById(id).orElse(null);
+    }
+
+    public PostImages getAttachmentsByUserId(long id)
+    {
+        return iPostImagesRepository.findById(id).orElse(null);
     }
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Metaverse - Profile</title>
+    </head>
+    <body>
+    <h1 th:text="${user.getUsername()}"/>
+
+    <h2>Posts</h2>
+    <ul>
+        <li th:each="post : ${posts}">
+            <p th:text="${post.getPostContent()}"/>
+            <div th:each="image : ${postAttachments}">
+                <img th:src="@{/images/image_{id}.jpg(id=${image.getId()})}" alt="Post image">
+            </div>
+            <small th:text="${{post.getCreatedAt()}}"/>
+        </li>
+    </ul>
+
+    <a th:href="@{/users}">Back to Users</a>
+    <br>
+    <a th:href="@{/}">Back to Home</a>
+    </body>
+</html>

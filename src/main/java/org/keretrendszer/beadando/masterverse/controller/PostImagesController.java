@@ -19,7 +19,7 @@ public class PostImagesController
         this.iPostImagesRepository = iPostImagesRepository;
     }
 
-    @GetMapping({"/{id}"})
+    @GetMapping({"/image_{id}.jpg"})
     public ResponseEntity<byte[]> getImageById(@PathVariable long id)
     {
         PostImages postImages = iPostImagesRepository.findById(id)

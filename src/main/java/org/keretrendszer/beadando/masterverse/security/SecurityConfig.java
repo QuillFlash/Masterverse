@@ -14,7 +14,8 @@ public class SecurityConfig
     {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index", "/images/**", "/home", "/about").permitAll()  // Ezek az oldalak elérhetők
+                        .requestMatchers("/", "/index", "/images/**", "/users",
+                                "users/**", "/profile", "/home", "/about").permitAll()  // Ezek az oldalak elérhetők
                         .anyRequest().denyAll()  // Az összes többi letiltva
                 )
                 .formLogin(AbstractHttpConfigurer::disable)  // A bejelentkező oldal teljes tiltása

@@ -5,22 +5,24 @@
   <title>Masterverse - Home</title>
 </head>
 <body>
-<h1>Welcome to Masterverse!</h1>
+    <h1>Welcome to Masterverse!</h1>
 
-<div th:each="post : ${posts}">
-  <h2 th:text="${post.getUserId().getUsername()}"></h2>
-  <p th:text="${post.getPostContent()}"></p>
-  <div th:each="image : ${postImages}">
-    <img th:src="@{/images/{id}(id=${image.getId()})}" alt="Post image">
-  </div>
-  <small th:text="${{post.getCreatedAt()}}"></small>
+    <a th:href="@{/users}">All Users</a>
 
-  <div th:each="comment : ${post.getComments()}">
-    <p th:text="${comment.getCommentContent()}"></p>
-    <small th:text="${comment.getCreatedAt()}"></small>
-  </div>
+    <div th:each="post : ${posts}">
+        <h2 th:text="${post.getUserId().getUsername()}"/>
+        <p th:text="${post.getPostContent()}"/>
+        <div th:each="image : ${postImages}">
+            <img th:src="@{/images/image_{id}.jpg(id=${image.getId()})}" alt="Post image">
+        </div>
+        <small th:text="${{post.getCreatedAt()}}"/>
 
-  <hr>
-</div>
+        <div th:each="comment : ${post.getComments()}">
+            <p th:text="${comment.getCommentContent()}"/>
+            <small th:text="${{comment.getCreatedAt()}}"/>
+        </div>
+
+        <hr>
+    </div>
 </body>
 </html>
