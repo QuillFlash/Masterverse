@@ -7,6 +7,17 @@
 <body>
     <h1>Welcome to Masterverse!</h1>
 
+    <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
+        <form th:action="@{/login}" method="post" style="display: inline;">
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
     <a th:href="@{/users}">All Users</a>
 
     <div th:each="post : ${posts}">

@@ -2,6 +2,7 @@ package org.keretrendszer.beadando.masterverse.service;
 import org.keretrendszer.beadando.masterverse.model.Users;
 import org.keretrendszer.beadando.masterverse.repository.IUsersRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
@@ -21,7 +22,12 @@ public class UsersService
 
     public Users getUserById(long id)
     {
-        return iUsersRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("No users found"));
+        return iUsersRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public void saveUser(Users user)
+    {
+        iUsersRepository.save(user);
     }
 }
