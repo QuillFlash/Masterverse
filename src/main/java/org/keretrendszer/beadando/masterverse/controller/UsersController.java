@@ -51,10 +51,10 @@ public class UsersController
     {
         Users user = usersService.getUserById(id);
         Posts userPosts = postsService.getPostsByUserId(id);
-        PostImages userPostAttachments = postsService.getAttachmentsByUserId(id);
+        PostImages userPostImages = postsService.getAttachmentsByUserId(id);
         model.addAttribute("user", user);
         model.addAttribute("posts", userPosts);
-        model.addAttribute("postAttachments", userPostAttachments);
+        model.addAttribute("postImages", userPostImages);
         return "profile";
     }
 

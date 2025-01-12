@@ -4,7 +4,9 @@ import org.keretrendszer.beadando.masterverse.repository.IUsersRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import java.util.stream.Collectors;
+import org.keretrendszer.beadando.masterverse.security.MasterverseUserDetails;
 
 @Service
 public class MasterverseUserDetailsService implements UserDetailsService
@@ -25,14 +27,12 @@ public class MasterverseUserDetailsService implements UserDetailsService
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
 
-        var authorities = user.getRoles().stream()
-                              .map(role -> new SimpleGrantedAuthority(role.getName()))
-                              .collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                                                       .map(role -> new SimpleGrantedAuthority(role.getName()))
+                                                       .collect(Collectors.toList());
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                authorities
-        );
+        return new MasterverseUserDetails(user.getId(),
+                user.getUsername(), user.getEmail(),
+                user.getPassword(), authorities);
     }
 }

@@ -1,5 +1,4 @@
 package org.keretrendszer.beadando.masterverse.model;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -8,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comment_likes")
@@ -21,22 +19,19 @@ public class CommentLikes
     @ManyToOne
     @JoinColumn(name = "comment_id", nullable = false,
                 foreignKey = @ForeignKey(name = "fk_comment_likes_comment"))
-    private Comment comment;
+    private Comment commentId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false,
                 foreignKey = @ForeignKey(name = "fk_comment_likes_user"))
-    private Users user;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Users userId;
 
     public CommentLikes() {}
 
-    public CommentLikes(Comment comment, Users user)
+    public CommentLikes(Comment commentId, Users userId)
     {
-        this.comment = comment;
-        this.user = user;
+        this.commentId = commentId;
+        this.userId = userId;
     }
 
     public long getId()
@@ -49,33 +44,23 @@ public class CommentLikes
         this.id = id;
     }
 
-    public Comment getComment()
+    public Comment getCommentId()
     {
-        return comment;
+        return commentId;
     }
 
-    public void setComment(Comment comment)
+    public void setCommentId(Comment commentId)
     {
-        this.comment = comment;
+        this.commentId = commentId;
     }
 
-    public Users getUser()
+    public Users getUserId()
     {
-        return user;
+        return userId;
     }
 
-    public void setUser(Users user)
+    public void setUserId(Users userId)
     {
-        this.user = user;
-    }
-
-    public LocalDateTime getCreatedAt()
-    {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt)
-    {
-        this.createdAt = createdAt;
+        this.userId = userId;
     }
 }
