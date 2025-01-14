@@ -1,5 +1,5 @@
 package org.keretrendszer.beadando.masterverse.controller;
-import org.keretrendszer.beadando.masterverse.model.PostImages;
+import org.keretrendszer.beadando.masterverse.db_read_helpers.PostDataRequestHelper;
 import org.keretrendszer.beadando.masterverse.model.Posts;
 import org.keretrendszer.beadando.masterverse.model.Roles;
 import org.keretrendszer.beadando.masterverse.model.Users;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,14 +24,17 @@ public class UsersController
     private final UsersService usersService;
     private final RolesService rolesService;
     private final PostsService postsService;
+    private final PostDataRequestHelper postDataRequestHelper;
     private final PasswordEncoder passwordEncoder;
 
-    public UsersController(UsersService usersService, RolesService rolesService,
-                           PostsService postsService, PasswordEncoder passwordEncoder)
+    public UsersController(UsersService usersService, RolesService rolesService, PostsService postsService,
+                           PostDataRequestHelper postDataRequestHelper,
+                           PasswordEncoder passwordEncoder)
     {
         this.usersService = usersService;
         this.rolesService = rolesService;
         this.postsService = postsService;
+        this.postDataRequestHelper = postDataRequestHelper;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -56,29 +58,17 @@ public class UsersController
                                   @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         Users user = usersService.getUserById(id);
-        if (user == null) return "redirect:/error/404";
-        List<Posts> userPosts = postsService.getPostsById(user.getId());
-        List<PostImages> userPostImages = postsService.getAllPostImages();
-        Map<Long, Long> likesForUserPosts = new HashMap<>();
-        Map<Long, Boolean> hasUserLikedAPost = new HashMap<>();
-        for (Posts post : userPosts)
+        if (user == null)
         {
-            long postId = post.getId();
-            long likeCount = postsService.countPostLikes(postId);
-            likesForUserPosts.put(postId, likeCount);
-            if (currentUser != null)
-            {
-                long userId = currentUser.getId();
-                boolean isPostLiked = postsService.hasUserLikedAPost(postId, userId);
-                hasUserLikedAPost.put(postId, isPostLiked);
-            }
-            else hasUserLikedAPost.put(postId, false);
+            return "redirect:/error/404";
         }
+        List<Posts> userPosts = postsService.getPostsById(user.getId());
+        Map<String, Object> processedData = postDataRequestHelper.processPostsData(userPosts, currentUser);
         model.addAttribute("user", user);
         model.addAttribute("posts", userPosts);
-        model.addAttribute("postImages", userPostImages);
-        model.addAttribute("likesForUsersPosts", likesForUserPosts);
-        model.addAttribute("hasUserLikedAPost", hasUserLikedAPost);
+        model.addAttribute("postImages", processedData.get("postImages"));
+        model.addAttribute("likesForUsersPosts", processedData.get("likesForPosts"));
+        model.addAttribute("hasUserLikedAPost", processedData.get("hasUserLikedAPost"));
         if (currentUser != null)
         {
             Users loggedInUser = usersService.getUserByUsername(currentUser.getUsername());

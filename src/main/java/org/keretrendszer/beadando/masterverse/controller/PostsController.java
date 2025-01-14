@@ -1,9 +1,9 @@
 package org.keretrendszer.beadando.masterverse.controller;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.keretrendszer.beadando.masterverse.db_read_helpers.PostDataRequestHelper;
 import org.keretrendszer.beadando.masterverse.model.PostImages;
 import org.keretrendszer.beadando.masterverse.model.Posts;
 import org.keretrendszer.beadando.masterverse.model.Users;
@@ -21,11 +21,13 @@ public class PostsController
 {
     private final PostsService postsService;
     private final UsersService usersService;
+    private final PostDataRequestHelper postDataRequestHelper;
 
-    public PostsController(PostsService postsService, UsersService usersService)
+    public PostsController(PostsService postsService, UsersService usersService, PostDataRequestHelper postDataRequestHelper)
     {
         this.postsService = postsService;
         this.usersService = usersService;
+        this.postDataRequestHelper = postDataRequestHelper;
     }
 
     @GetMapping({"/"})
@@ -33,29 +35,11 @@ public class PostsController
                               @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         List<Posts> allPosts = postsService.getAllPosts();
-        List<PostImages> allPostImages = postsService.getAllPostImages();
-        Map<Long, Long> likesForAllPosts = new HashMap<>();
-        Map<Long, Boolean> hasUserLikedAPost = new HashMap<>();
-        for (Posts post : allPosts)
-        {
-            long postId = post.getId();
-            long likeCount = postsService.countPostLikes(postId);
-            likesForAllPosts.put(postId, likeCount);
-            if (currentUser != null)
-            {
-                long userId = currentUser.getId();
-                boolean isPostLiked = postsService.hasUserLikedAPost(postId, userId);
-                hasUserLikedAPost.put(postId, isPostLiked);
-            }
-            else
-            {
-                hasUserLikedAPost.put(postId, false);
-            }
-        }
+        Map<String, Object> processedData = postDataRequestHelper.processPostsData(allPosts, currentUser);
         model.addAttribute("posts", allPosts);
-        model.addAttribute("postImages", allPostImages);
-        model.addAttribute("likesForAllPosts", likesForAllPosts);
-        model.addAttribute("hasUserLikedAPost", hasUserLikedAPost);
+        model.addAttribute("postImages", processedData.get("postImages"));
+        model.addAttribute("likesForAllPosts", processedData.get("likesForPosts"));
+        model.addAttribute("hasUserLikedAPost", processedData.get("hasUserLikedAPost"));
         return "index";
     }
 
