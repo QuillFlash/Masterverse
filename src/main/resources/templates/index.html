@@ -18,12 +18,19 @@
             <button type="submit">Logout</button>
         </form>
     </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/create_post}" method="get" style="display: inline;">
+            <button type="submit">Post something</button>
+        </form>
+    </div>
+
     <a th:href="@{/users}">All Users</a>
 
     <div th:each="post : ${posts}">
         <h2 th:text="${post.getUserId().getUsername()}"/>
         <p th:text="${post.getPostContent()}"/>
-        <div th:each="image : ${postImages}">
+        <div th:each="image : ${post.getPostImages()}">
             <img th:src="@{/images/post_image_{id}.jpg(id=${image.getId()})}" alt="Post image">
         </div>
         <p>

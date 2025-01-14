@@ -1,24 +1,34 @@
 package org.keretrendszer.beadando.masterverse.controller;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.keretrendszer.beadando.masterverse.model.PostImages;
 import org.keretrendszer.beadando.masterverse.model.Posts;
+import org.keretrendszer.beadando.masterverse.model.Users;
 import org.keretrendszer.beadando.masterverse.security.MasterverseUserDetails;
 import org.keretrendszer.beadando.masterverse.service.PostsService;
+import org.keretrendszer.beadando.masterverse.service.UsersService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class PostsController
 {
     private final PostsService postsService;
+    private final UsersService usersService;
 
-    public PostsController(PostsService postsService)
+    public PostsController(PostsService postsService, UsersService usersService)
     {
         this.postsService = postsService;
+        this.usersService = usersService;
     }
 
     @GetMapping({"/"})
@@ -40,12 +50,51 @@ public class PostsController
                 boolean isPostLiked = postsService.hasUserLikedAPost(postId, userId);
                 hasUserLikedAPost.put(postId, isPostLiked);
             }
-            else hasUserLikedAPost.put(postId, false);
+            else
+            {
+                hasUserLikedAPost.put(postId, false);
+            }
         }
         model.addAttribute("posts", allPosts);
         model.addAttribute("postImages", allPostImages);
         model.addAttribute("likesForAllPosts", likesForAllPosts);
         model.addAttribute("hasUserLikedAPost", hasUserLikedAPost);
         return "index";
+    }
+
+    @GetMapping("/create_post")
+    public String showCreatePostForm(Model model)
+    {
+        model.addAttribute("post", new Posts());
+        return "create_post";
+    }
+
+    @PostMapping("/create_post")
+    public String createPost(@ModelAttribute("post") Posts post,
+                             @RequestParam(name = "post_images", required = false)
+                             List<MultipartFile> postImages,
+                             @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    throws IOException
+    {
+        long userId = currentUser.getId();
+        Users loggedInUser = usersService.getUserById(userId);
+        String postContent = Optional.ofNullable(post.getPostContent()).orElse("");
+        post.setPostContent(postContent.trim());
+        post.setUserId(loggedInUser);
+        if (postImages != null)
+        {
+            for (MultipartFile postImage : postImages)
+            {
+                if (!postImage.isEmpty())
+                {
+                    PostImages databaseSlotForImage = new PostImages();
+                    databaseSlotForImage.setPostId(post);
+                    databaseSlotForImage.setImage(postImage.getBytes());
+                    post.getPostImages().add(databaseSlotForImage);
+                }
+            }
+        }
+        postsService.savePost(post);
+        return "redirect:/";
     }
 }

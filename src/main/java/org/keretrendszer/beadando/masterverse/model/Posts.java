@@ -33,6 +33,9 @@ public class Posts
             foreignKey = @ForeignKey(name = "fk_post_user"))
     private Users userId;
 
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImages> postImages = new ArrayList<>();
+
     @OneToMany(mappedBy = "postId", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
@@ -41,6 +44,13 @@ public class Posts
     public Posts(String postContent, Users userId)
     {
         this.postContent = postContent;
+        this.userId = userId;
+    }
+
+    public Posts(String postContent, List<PostImages> postImages, Users userId)
+    {
+        this.postContent = postContent;
+        this.postImages = postImages;
         this.userId = userId;
     }
 
@@ -92,5 +102,15 @@ public class Posts
     public void setComments(List<Comment> comments)
     {
         this.comments = comments;
+    }
+
+    public List<PostImages> getPostImages()
+    {
+        return postImages;
+    }
+
+    public void setPostImages(List<PostImages> postImages)
+    {
+        this.postImages = postImages;
     }
 }

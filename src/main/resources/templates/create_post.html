@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Masterverse - Share What's On Your Mind</title>
+</head>
+  <body>
+    <h1>Post something on Masterverse!</h1>
+    <form th:action="@{/create_post}"
+          method="post"
+          enctype="multipart/form-data"
+          th:object="${post}">
+      <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+      <label hidden="hidden" for="post_box"></label>
+      <textarea id="post_box" name="post_box" th:field="*{postContent}" rows="5"
+      cols="60" placeholder="Write your post here..." required></textarea>
+      <div>
+        <label for="post_images">Upload images (format: JPG):</label><br/>
+        <input type="file" id="post_images" name="post_images" multiple />
+      </div>
+      <div>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </body>
+</html>
