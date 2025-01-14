@@ -17,7 +17,7 @@ public class SecurityConfig
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index", "/images/**", "/users",
-                                "/users/**", "/profile", "/home", "/about",
+                                "/users/**", "/users/{id}/profile", "/profile", "/home", "/about",
                                 "/login", "/logout", "/register", "/registration").permitAll()  // Ezek az oldalak mindenkinek elérhetők
                         .requestMatchers("/admin", "/admin/**").hasRole("admin") // Csak admin hozzáféréssel elérhetők
                         .anyRequest().authenticated()  // Az összes többi hitelesítést igényel

@@ -25,6 +25,11 @@ public class UsersService
         return iUsersRepository.findById(id).orElse(null);
     }
 
+    public Users getUserByUsername(String username)
+    {
+        return iUsersRepository.findByUsername(username);
+    }
+
     @Transactional
     public void saveUser(Users user)
     {

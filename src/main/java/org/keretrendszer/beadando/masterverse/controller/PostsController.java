@@ -13,10 +13,7 @@ import org.keretrendszer.beadando.masterverse.service.UsersService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -69,6 +66,15 @@ public class PostsController
         return "create_post";
     }
 
+    @GetMapping("/modify_post/{post_id}")
+    public String modifyPost(@PathVariable("post_id") long postId, Model model)
+    {
+        Posts existingPost = postsService.getAPostById(postId);
+        if (existingPost == null) return "redirect:/error";
+        model.addAttribute("modifiedPost", existingPost);
+        return "modify_post";
+    }
+
     @PostMapping("/create_post")
     public String createPost(@ModelAttribute("post") Posts post,
                              @RequestParam(name = "post_images", required = false)
@@ -76,6 +82,10 @@ public class PostsController
                              @AuthenticationPrincipal MasterverseUserDetails currentUser)
     throws IOException
     {
+        if (currentUser == null)
+        {
+            throw new RuntimeException("ERROR: You must be logged in to create a post.");
+        }
         long userId = currentUser.getId();
         Users loggedInUser = usersService.getUserById(userId);
         String postContent = Optional.ofNullable(post.getPostContent()).orElse("");
@@ -95,6 +105,37 @@ public class PostsController
             }
         }
         postsService.savePost(post);
+        return "redirect:/";
+    }
+
+    @PutMapping("/modify_post/{post_id}")
+    public String modifyPost(@PathVariable("post_id") long postId,
+                             @ModelAttribute("modifiedPost") Posts post,
+                             @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    {
+        if (currentUser == null)
+        {
+            throw new RuntimeException("ERROR: You must be logged in to create a post.");
+        }
+        long userId = currentUser.getId();
+        Users loggedInUser = usersService.getUserById(userId);
+        Posts existingPost = postsService.getAPostById(postId);
+        if (loggedInUser == null)
+        {
+            throw new IllegalArgumentException("ERROR: This user does not exist in the database.");
+        }
+        if (existingPost == null)
+        {
+            throw new IllegalArgumentException("ERROR: No post found with post ID " + postId + ".");
+        }
+        if (!existingPost.getUserId().equals(loggedInUser))
+        {
+            throw new RuntimeException("You don't have permission to modify this post!");
+        }
+        String postNewContent = Optional.ofNullable(post.getPostContent()).orElse("");
+        existingPost.setPostContent(postNewContent);
+        existingPost.setUserId(existingPost.getUserId());
+        postsService.savePost(existingPost);
         return "redirect:/";
     }
 }

@@ -46,20 +46,29 @@ public class CommentsService
         return iCommentLikesRepository.countByCommentId_Id(id);
     }
 
-    public Comment getCommentsByUserId(long id)
+    public Comment getACommentById(long id)
     {
         return iCommentRepository.findById(id).orElse(null);
     }
 
-    public CommentImages getAttachmentsByUserId(long id)
+    public List<Comment> getCommentsById(long id)
+    {
+        return iCommentRepository.findAllByPostId_Id(id);
+    }
+
+    public CommentImages getAnAttachmentById(long id)
     {
         return iCommentImagesRepository.findById(id).orElse(null);
     }
 
+    public List<CommentImages> getAttachmentsById(long id)
+    {
+        return iCommentImagesRepository.findAllByCommentId_Id(id);
+    }
+
     public boolean hasUserLikedAComment(long postId, long userId)
     {
-        return iCommentLikesRepository.existsByCommentId_IdAndUserId_Id
-        (postId, userId);
+        return iCommentLikesRepository.existsByCommentId_IdAndUserId_Id(postId, userId);
     }
 
     @Transactional

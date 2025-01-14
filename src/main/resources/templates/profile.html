@@ -17,6 +17,12 @@
             </form>
         </div>
 
+        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+            <form th:action="@{/create_post}" method="get" style="display: inline;">
+                <button type="submit">Post something</button>
+            </form>
+        </div>
+
         <h1 th:text="${user.getUsername()}"/>
         <small th:text="'Account created at: ' + ${{user.getCreatedAt()}}"/>
 
@@ -24,35 +30,34 @@
         <ul>
             <li th:each="post : ${posts}">
                 <p th:text="${post.getPostContent()}"/>
-                <div th:each="image : ${postImages}">
+                <div th:each="image : ${post.getPostImages()}">
                     <img th:src="@{/images/post_image_{id}.jpg(id=${image.getId()})}" alt="Post image">
                 </div>
                 <p>
-                    <span th:text="${likesForAllPosts.get(post.getId())} + ' likes'"/>
+                    <span th:text="${likesForUsersPosts.get(post.getId())} + ' likes'"/>
                 </p>
-                <div th:if="${!hasUserLikedAPost.get(post.getId())}">
-                    <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
-                        <form th:action="@{/login}" method="get">
-                            <button type="submit">Like</button>
-                        </form>
-                    </div>
-                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser'}">
+                    <div th:if="${!hasUserLikedAPost.get(post.getId()) && currentUser != null}">
                         <form th:action="@{/posts/{postId}/like(postId=${post.getId()})}" method="post">
                             <button type="submit">Like</button>
                         </form>
+                        <div th:if="${post.getUserId().getUsername() == currentUser.username}">
+                            <form th:action="@{/modify_post/{id}(id=${post.getId()})}" method="get">
+                                <button type="submit">Edit</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-                && hasUserLikedAPost.get(post.getId()) == true}">
-                    <form th:action="@{/posts/{postId}/remove_like(postId=${post.getId()})}" method="post">
-                        <button type="submit">Remove Like</button>
-                    </form>
+                    <div th:if="${hasUserLikedAPost.get(post.getId())}">
+                        <form th:action="@{/posts/{postId}/remove_like(postId=${post.getId()})}" method="post">
+                            <button type="submit">Remove Like</button>
+                        </form>
+                    </div>
                 </div>
                 <small th:text="${{post.getCreatedAt()}}"/>
 
                 <hr style="height: 1px; background-color: black; width: 25%;">
 
-                <div th:each="comment : ${post.getComments()}">
+                <!--<div th:each="comment : ${post.getComments()}">
                     <p th:text="${comment.getCommentContent()}"/>
                     <div th:each="commentImage : ${commentImages}">
                         <img th:src="@{/images/comment_image_{id}.jpg(id=${commentImage.getId()})}" alt="Comment image">
@@ -79,7 +84,7 @@
                         </form>
                     </div>
                     <small th:text="${{comment.getCreatedAt()}}"/>
-                </div>
+                </div>-->
             </li>
         </ul>
 

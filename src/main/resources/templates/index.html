@@ -42,14 +42,22 @@
                     <button type="submit">Like</button>
                 </form>
             </div>
-            <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+            <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+            && post.getUserId().getUsername() != #authentication.getName()}">
                 <form th:action="@{/posts/{postId}/like(postId=${post.getId()})}" method="post">
                     <button type="submit">Like</button>
                 </form>
             </div>
+            <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+            && post.getUserId().getUsername() == #authentication.getName()}">
+                <form th:action="@{/modify_post/{id}(id=${post.getId()})}" method="get">
+                    <button type="submit">Edit</button>
+                </form>
+            </div>
         </div>
         <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-            && hasUserLikedAPost.get(post.getId()) == true}">
+            && hasUserLikedAPost.get(post.getId()) == true
+            && post.getUserId().getUsername() != #authentication.getName()}">
             <form th:action="@{/posts/{postId}/remove_like(postId=${post.getId()})}" method="post">
                 <button type="submit">Remove Like</button>
             </form>

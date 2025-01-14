@@ -19,7 +19,7 @@
     <h1>Registered Users</h1>
     <ul>
         <li th:each="user : ${users}">
-            <a th:href="@{/users/{id}(id=${user.getId()})}" th:text="${user.getUsername()}"></a>
+            <a th:href="@{/users/{id}/profile(id=${user.getId()})}" th:text="${user.getUsername()}"></a>
         </li>
     </ul>
     <a th:href="@{/}">Back to Home</a>

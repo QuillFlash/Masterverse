@@ -36,7 +36,7 @@ public class Comment
     private String commentContent;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private final LocalDateTime createdAt = LocalDateTime.now();
 
     public Comment() {}
 
@@ -90,10 +90,5 @@ public class Comment
     public LocalDateTime getCreatedAt()
     {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt)
-    {
-        this.createdAt = createdAt;
     }
 }

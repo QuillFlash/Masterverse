@@ -26,7 +26,7 @@ public class Posts
     private String postContent;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private final LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false,
@@ -79,11 +79,6 @@ public class Posts
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt)
-    {
-        this.createdAt = createdAt;
-    }
-
     public Users getUserId()
     {
         return userId;
@@ -109,8 +104,18 @@ public class Posts
         return postImages;
     }
 
-    public void setPostImages(List<PostImages> postImages)
+    @Override
+    public boolean equals(Object o)
     {
-        this.postImages = postImages;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Posts posts = (Posts) o;
+        return getUserId().equals(posts.getUserId());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getUserId().hashCode();
     }
 }

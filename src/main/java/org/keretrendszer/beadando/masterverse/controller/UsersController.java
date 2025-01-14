@@ -3,9 +3,11 @@ import org.keretrendszer.beadando.masterverse.model.PostImages;
 import org.keretrendszer.beadando.masterverse.model.Posts;
 import org.keretrendszer.beadando.masterverse.model.Roles;
 import org.keretrendszer.beadando.masterverse.model.Users;
+import org.keretrendszer.beadando.masterverse.security.MasterverseUserDetails;
 import org.keretrendszer.beadando.masterverse.service.PostsService;
 import org.keretrendszer.beadando.masterverse.service.RolesService;
 import org.keretrendszer.beadando.masterverse.service.UsersService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class UsersController
@@ -46,15 +50,41 @@ public class UsersController
         return "users";
     }
 
-    @GetMapping("/users/{id}")
-    public String viewUserProfile(@PathVariable long id, Model model)
+    @GetMapping("/users/{id}/profile")
+    public String viewUserProfile(@PathVariable long id,
+                                  Model model,
+                                  @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         Users user = usersService.getUserById(id);
-        Posts userPosts = postsService.getPostsByUserId(id);
-        PostImages userPostImages = postsService.getAttachmentsByUserId(id);
+        if (user == null) return "redirect:/error/404";
+        List<Posts> userPosts = postsService.getPostsById(user.getId());
+        List<PostImages> userPostImages = postsService.getAllPostImages();
+        Map<Long, Long> likesForUserPosts = new HashMap<>();
+        Map<Long, Boolean> hasUserLikedAPost = new HashMap<>();
+        for (Posts post : userPosts)
+        {
+            long postId = post.getId();
+            long likeCount = postsService.countPostLikes(postId);
+            likesForUserPosts.put(postId, likeCount);
+            if (currentUser != null)
+            {
+                long userId = currentUser.getId();
+                boolean isPostLiked = postsService.hasUserLikedAPost(postId, userId);
+                hasUserLikedAPost.put(postId, isPostLiked);
+            }
+            else hasUserLikedAPost.put(postId, false);
+        }
         model.addAttribute("user", user);
         model.addAttribute("posts", userPosts);
         model.addAttribute("postImages", userPostImages);
+        model.addAttribute("likesForUsersPosts", likesForUserPosts);
+        model.addAttribute("hasUserLikedAPost", hasUserLikedAPost);
+        if (currentUser != null)
+        {
+            Users loggedInUser = usersService.getUserByUsername(currentUser.getUsername());
+            model.addAttribute("currentUser", loggedInUser);
+        }
+        else model.addAttribute("currentUser", null);
         return "profile";
     }
 

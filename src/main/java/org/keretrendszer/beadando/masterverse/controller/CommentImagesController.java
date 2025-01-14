@@ -22,7 +22,7 @@ public class CommentImagesController
     @GetMapping("/comment_image_{id}.jpg")
     public ResponseEntity<byte[]> getImageById(@PathVariable long id)
     {
-        CommentImages commentImages = commentsService.getAttachmentsByUserId(id);
+        CommentImages commentImages = commentsService.getAnAttachmentById(id);
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG)
         .body(commentImages.getImage());
     }

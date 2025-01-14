@@ -51,14 +51,24 @@ public class PostsService
         return iPostLikesRepository.existsByPostId_IdAndUserId_Id(postId, userId);
     }
 
-    public Posts getPostsByUserId(long id)
+    public Posts getAPostById(long id)
     {
         return iPostsRepository.findById(id).orElse(null);
     }
 
-    public PostImages getAttachmentsByUserId(long id)
+    public List<Posts> getPostsById(long id)
+    {
+        return iPostsRepository.findAllByUserId_Id(id);
+    }
+
+    public PostImages getAnAttachmentById(long id)
     {
         return iPostImagesRepository.findById(id).orElse(null);
+    }
+
+    public List<PostImages> getAttachmentsById(long id)
+    {
+        return iPostImagesRepository.findAllByPostId_Id(id);
     }
 
     @Transactional

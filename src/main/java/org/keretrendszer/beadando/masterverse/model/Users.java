@@ -28,7 +28,7 @@ public class Users
     private byte[] profilePicture;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private final LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
@@ -101,11 +101,6 @@ public class Users
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt)
-    {
-        this.createdAt = createdAt;
-    }
-
     public String getPassword()
     {
         return password;
@@ -174,5 +169,20 @@ public class Users
     public void setRoles(Set<Roles> roles)
     {
         this.roles = roles;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Users users = (Users) o;
+        return getId() == users.getId();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Long.hashCode(getId());
     }
 }

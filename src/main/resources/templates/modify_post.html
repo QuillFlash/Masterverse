@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Masterverse - Modify Your Post</title>
+</head>
+    <body>
+        <h1>Modify your post</h1>
+        <form th:action="@{/modify_post/{id}(id=${modifiedPost.getId()})}"
+              method="post"
+              enctype="multipart/form-data"
+              th:object="${modifiedPost}">
+            <input type="hidden" name="_method" value="PUT"/>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+            <label hidden="hidden" for="postContent"></label>
+            <textarea name="postContent"
+                      id="postContent"
+                      rows="5" cols="60"
+                      th:text="${modifiedPost.postContent}"></textarea>
+            <br>
+            <button type="submit">Save Changes</button>
+        </form>
+    </body>
+</html>
