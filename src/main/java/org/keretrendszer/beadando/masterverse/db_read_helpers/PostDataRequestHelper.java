@@ -11,7 +11,6 @@ import java.util.Map;
 @Component
 public class PostDataRequestHelper
 {
-
     private final PostsService postsService;
 
     public PostDataRequestHelper(PostsService postsService)

@@ -36,7 +36,7 @@ public class Posts
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImages> postImages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "postId", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     public Posts() {}

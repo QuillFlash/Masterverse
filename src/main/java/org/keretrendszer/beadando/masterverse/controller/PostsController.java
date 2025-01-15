@@ -3,11 +3,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.keretrendszer.beadando.masterverse.db_read_helpers.CommentDataRequestHelper;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.PostDataRequestHelper;
+import org.keretrendszer.beadando.masterverse.db_read_helpers.ValidationHelper;
+import org.keretrendszer.beadando.masterverse.model.Comment;
 import org.keretrendszer.beadando.masterverse.model.PostImages;
 import org.keretrendszer.beadando.masterverse.model.Posts;
 import org.keretrendszer.beadando.masterverse.model.Users;
 import org.keretrendszer.beadando.masterverse.security.MasterverseUserDetails;
+import org.keretrendszer.beadando.masterverse.service.CommentsService;
 import org.keretrendszer.beadando.masterverse.service.PostsService;
 import org.keretrendszer.beadando.masterverse.service.UsersService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,24 +26,35 @@ public class PostsController
     private final PostsService postsService;
     private final UsersService usersService;
     private final PostDataRequestHelper postDataRequestHelper;
+    private final CommentsService commentsService;
+    private final CommentDataRequestHelper commentDataRequestHelper;
 
-    public PostsController(PostsService postsService, UsersService usersService, PostDataRequestHelper postDataRequestHelper)
+    public PostsController(PostsService postsService, UsersService usersService, PostDataRequestHelper postDataRequestHelper,
+                           CommentsService commentsService, CommentDataRequestHelper commentDataRequestHelper)
     {
         this.postsService = postsService;
         this.usersService = usersService;
         this.postDataRequestHelper = postDataRequestHelper;
+        this.commentsService = commentsService;
+        this.commentDataRequestHelper = commentDataRequestHelper;
     }
 
     @GetMapping({"/"})
-    public String getAllPosts(Model model,
-                              @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    public String getAllPostsAndComments(Model model,
+                                         @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         List<Posts> allPosts = postsService.getAllPosts();
-        Map<String, Object> processedData = postDataRequestHelper.processPostsData(allPosts, currentUser);
+        List<Comment> allComments = commentsService.getAllComments();
+        Map<String, Object> processedPostData = postDataRequestHelper.processPostsData(allPosts, currentUser);
+        Map<String, Object> processedCommentData = commentDataRequestHelper.processCommentsData(allComments, currentUser);
         model.addAttribute("posts", allPosts);
-        model.addAttribute("postImages", processedData.get("postImages"));
-        model.addAttribute("likesForAllPosts", processedData.get("likesForPosts"));
-        model.addAttribute("hasUserLikedAPost", processedData.get("hasUserLikedAPost"));
+        model.addAttribute("postImages", processedPostData.get("postImages"));
+        model.addAttribute("likesForAllPosts", processedPostData.get("likesForPosts"));
+        model.addAttribute("hasUserLikedAPost", processedPostData.get("hasUserLikedAPost"));
+        model.addAttribute("comments", allComments);
+        model.addAttribute("commentImages", processedCommentData.get("commentImages"));
+        model.addAttribute("likesForComments", processedCommentData.get("likesForComments"));
+        model.addAttribute("hasUserLikedAComment", processedCommentData.get("hasUserLikedAComment"));
         return "index";
     }
 
@@ -104,18 +119,10 @@ public class PostsController
         long userId = currentUser.getId();
         Users loggedInUser = usersService.getUserById(userId);
         Posts existingPost = postsService.getAPostById(postId);
-        if (loggedInUser == null)
-        {
-            throw new IllegalArgumentException("ERROR: This user does not exist in the database.");
-        }
-        if (existingPost == null)
-        {
-            throw new IllegalArgumentException("ERROR: No post found with post ID " + postId + ".");
-        }
-        if (!existingPost.getUserId().equals(loggedInUser))
-        {
-            throw new RuntimeException("You don't have permission to modify this post!");
-        }
+        ValidationHelper validationHelper = new ValidationHelper();
+        validationHelper.validatePostExistence(existingPost, postId);
+        validationHelper.validateUserExistence(loggedInUser);
+        validationHelper.validatePermissions(loggedInUser, existingPost.getUserId(), "post");
         String postNewContent = Optional.ofNullable(post.getPostContent()).orElse("");
         existingPost.setPostContent(postNewContent);
         existingPost.setUserId(existingPost.getUserId());

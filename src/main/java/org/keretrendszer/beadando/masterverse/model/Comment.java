@@ -1,14 +1,8 @@
 package org.keretrendszer.beadando.masterverse.model;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
@@ -31,6 +25,9 @@ public class Comment
                 foreignKey = @ForeignKey(name = "fk_user_id"),
                 referencedColumnName = "id")
     private Users userId;
+
+    @OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentImages> commentImages = new ArrayList<>();
 
     @Column(name = "comment_content", nullable = false)
     private String commentContent;
@@ -75,6 +72,16 @@ public class Comment
     public void setUserId(Users userId)
     {
         this.userId = userId;
+    }
+
+    public List<CommentImages> getCommentImages()
+    {
+        return commentImages;
+    }
+
+    public void setCommentImages(List<CommentImages> commentImages)
+    {
+        this.commentImages = commentImages;
     }
 
     public String getCommentContent()

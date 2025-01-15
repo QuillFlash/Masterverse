@@ -1,9 +1,12 @@
 package org.keretrendszer.beadando.masterverse.controller;
+import org.keretrendszer.beadando.masterverse.db_read_helpers.CommentDataRequestHelper;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.PostDataRequestHelper;
+import org.keretrendszer.beadando.masterverse.model.Comment;
 import org.keretrendszer.beadando.masterverse.model.Posts;
 import org.keretrendszer.beadando.masterverse.model.Roles;
 import org.keretrendszer.beadando.masterverse.model.Users;
 import org.keretrendszer.beadando.masterverse.security.MasterverseUserDetails;
+import org.keretrendszer.beadando.masterverse.service.CommentsService;
 import org.keretrendszer.beadando.masterverse.service.PostsService;
 import org.keretrendszer.beadando.masterverse.service.RolesService;
 import org.keretrendszer.beadando.masterverse.service.UsersService;
@@ -26,16 +29,24 @@ public class UsersController
     private final PostsService postsService;
     private final PostDataRequestHelper postDataRequestHelper;
     private final PasswordEncoder passwordEncoder;
+    private final CommentsService commentsService;
+    private final CommentDataRequestHelper commentDataRequestHelper;
 
-    public UsersController(UsersService usersService, RolesService rolesService, PostsService postsService,
+    public UsersController(UsersService usersService,
+                           RolesService rolesService,
+                           PostsService postsService,
                            PostDataRequestHelper postDataRequestHelper,
-                           PasswordEncoder passwordEncoder)
+                           PasswordEncoder passwordEncoder,
+                           CommentsService commentsService,
+                           CommentDataRequestHelper commentDataRequestHelper)
     {
         this.usersService = usersService;
         this.rolesService = rolesService;
         this.postsService = postsService;
         this.postDataRequestHelper = postDataRequestHelper;
         this.passwordEncoder = passwordEncoder;
+        this.commentsService = commentsService;
+        this.commentDataRequestHelper = commentDataRequestHelper;
     }
 
     @GetMapping("/login")
@@ -58,17 +69,20 @@ public class UsersController
                                   @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         Users user = usersService.getUserById(id);
-        if (user == null)
-        {
-            return "redirect:/error/404";
-        }
+        if (user == null) return "redirect:/error/404";
         List<Posts> userPosts = postsService.getPostsById(user.getId());
-        Map<String, Object> processedData = postDataRequestHelper.processPostsData(userPosts, currentUser);
+        List<Comment> comments = commentsService.getAllComments();
+        Map<String, Object> processedPostData = postDataRequestHelper.processPostsData(userPosts, currentUser);
+        Map<String, Object> processedCommentData = commentDataRequestHelper.processCommentsData(comments, currentUser);
         model.addAttribute("user", user);
         model.addAttribute("posts", userPosts);
-        model.addAttribute("postImages", processedData.get("postImages"));
-        model.addAttribute("likesForUsersPosts", processedData.get("likesForPosts"));
-        model.addAttribute("hasUserLikedAPost", processedData.get("hasUserLikedAPost"));
+        model.addAttribute("postImages", processedPostData.get("postImages"));
+        model.addAttribute("likesForUsersPosts", processedPostData.get("likesForPosts"));
+        model.addAttribute("hasUserLikedAPost", processedPostData.get("hasUserLikedAPost"));
+        model.addAttribute("comments", comments);
+        model.addAttribute("commentImages", processedCommentData.get("commentImages"));
+        model.addAttribute("likesForComments", processedCommentData.get("likesForComments"));
+        model.addAttribute("hasUserLikedAComment", processedCommentData.get("hasUserLikedAComment"));
         if (currentUser != null)
         {
             Users loggedInUser = usersService.getUserByUsername(currentUser.getUsername());

@@ -17,8 +17,8 @@ public class CommentLikesController
     }
 
     @PostMapping("/{commentId}/like")
-    public String likePost(@PathVariable long commentId,
-                           @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    public String likeComment(@PathVariable long commentId,
+                              @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         long userId = currentUser.getId();
         commentsService.likeComment(commentId, userId);
@@ -26,8 +26,8 @@ public class CommentLikesController
     }
 
     @PostMapping("/{commentId}/remove_like")
-    public String removeLikeFromPost(@PathVariable long commentId,
-                                     @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    public String removeLikeFromComment(@PathVariable long commentId,
+                                        @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         long userId = currentUser.getId();
         commentsService.removeLikeFromComment(commentId, userId);

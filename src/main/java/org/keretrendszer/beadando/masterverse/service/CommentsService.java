@@ -1,12 +1,6 @@
 package org.keretrendszer.beadando.masterverse.service;
-import org.keretrendszer.beadando.masterverse.model.Comment;
-import org.keretrendszer.beadando.masterverse.model.CommentImages;
-import org.keretrendszer.beadando.masterverse.model.CommentLikes;
-import org.keretrendszer.beadando.masterverse.model.Users;
-import org.keretrendszer.beadando.masterverse.repository.ICommentImagesRepository;
-import org.keretrendszer.beadando.masterverse.repository.ICommentLikesRepository;
-import org.keretrendszer.beadando.masterverse.repository.ICommentRepository;
-import org.keretrendszer.beadando.masterverse.repository.IUsersRepository;
+import org.keretrendszer.beadando.masterverse.model.*;
+import org.keretrendszer.beadando.masterverse.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -15,22 +9,23 @@ import java.util.Optional;
 @Service
 public class CommentsService
 {
+    private final IPostsRepository iPostsRepository;
     private final ICommentRepository iCommentRepository;
     private final ICommentImagesRepository iCommentImagesRepository;
     private final ICommentLikesRepository iCommentLikesRepository;
     private final IUsersRepository iUsersRepository;
 
-    public CommentsService(ICommentRepository iCommentRepository,
+    public CommentsService(IPostsRepository iPostsRepository, ICommentRepository iCommentRepository,
                            ICommentImagesRepository iCommentImagesRepository,
-                           ICommentLikesRepository iCommentLikesRepository,
-                           IUsersRepository iUsersRepository)
+                           ICommentLikesRepository iCommentLikesRepository, IUsersRepository iUsersRepository)
     {
+        this.iPostsRepository = iPostsRepository;
         this.iCommentRepository = iCommentRepository;
         this.iCommentImagesRepository = iCommentImagesRepository;
         this.iCommentLikesRepository = iCommentLikesRepository;
         this.iUsersRepository = iUsersRepository;
     }
-    
+
     public List<Comment> getAllComments()
     {
         return iCommentRepository.findAll();

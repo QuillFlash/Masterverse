@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Masterverse - React to a Post</title>
+</head>
+  <body>
+    <h1>Tell everyone how you feel about a post!</h1>
+    <form th:action="@{/posts/{post_id}/create_comment(post_id=${post_id})}"
+          method="post"
+          enctype="multipart/form-data"
+          th:object="${comment}">
+      <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+      <label hidden="hidden" for="comment_box"></label>
+      <textarea id="comment_box" name="comment_box" th:field="*{commentContent}" rows="5"
+      cols="60" placeholder="Write your comment here..." required></textarea>
+      <div>
+        <label for="comment_images">Upload images (format: JPG):</label><br/>
+        <input type="file" id="comment_images" name="uploadedCommentImages" multiple />
+      </div>
+      <div>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </body>
+</html>

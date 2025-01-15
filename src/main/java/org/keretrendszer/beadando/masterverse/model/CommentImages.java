@@ -1,14 +1,5 @@
 package org.keretrendszer.beadando.masterverse.model;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "comment_images")
@@ -19,7 +10,8 @@ public class CommentImages
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "comment_id", nullable = false)
+    @JoinColumn(name = "comment_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_attachment_on_comment"))
     private Comment commentId;
 
     @Lob

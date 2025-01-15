@@ -62,19 +62,25 @@
                 <button type="submit">Remove Like</button>
             </form>
         </div>
+        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+            <form th:action="@{/posts/{id}/create_comment(id=${post.getId()})}" method="get">
+                <button type="submit">Comment</button>
+            </form>
+        </div>
         <small th:text="${{post.getCreatedAt()}}"/>
 
         <hr style="height: 1px; background-color: black; width: 25%;">
 
         <div th:each="comment : ${post.getComments()}">
+            <h2 th:text="${comment.getUserId().getUsername()}"/>
             <p th:text="${comment.getCommentContent()}"/>
-            <div th:each="commentImage : ${commentImages}">
+            <div th:each="commentImage : ${comment.getCommentImages()}">
                 <img th:src="@{/images/comment_image_{id}.jpg(id=${commentImage.getId()})}" alt="Comment image">
             </div>
             <p>
-                <span th:text="${likesForAllComments.get(comment.getId())} + ' likes'"/>
+                <span th:text="${likesForComments.get(comment.getId())} + ' likes'"/>
             </p>
-            <div th:if="${!likesForAllComments.get(comment.getId())}">
+            <div th:if="${!hasUserLikedAComment.get(comment.getId())}">
                 <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
                     <form th:action="@{/login}" method="get">
                         <button type="submit">Like</button>
@@ -83,6 +89,12 @@
                 <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
                     <form th:action="@{/comments/{id}/like(id=${comment.getId()})}" method="post">
                         <button type="submit">Like</button>
+                    </form>
+                </div>
+                <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+            && comment.getUserId().getUsername() == #authentication.getName()}">
+                    <form th:action="@{/modify_comment/{id}(id=${comment.getId()})}" method="get">
+                        <button type="submit">Edit</button>
                     </form>
                 </div>
             </div>

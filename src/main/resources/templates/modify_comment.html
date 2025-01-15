@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Masterverse - Modify Your Comment</title>
+</head>
+    <body>
+        <h1>Modify your comment</h1>
+        <form th:action="@{/modify_comment/{id}(id=${modifiedComment.getId()})}"
+              method="post"
+              enctype="multipart/form-data"
+              th:object="${modifiedComment}">
+            <input type="hidden" name="_method" value="PUT"/>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+            <label hidden="hidden" for="commentContent"></label>
+            <textarea name="commentContent"
+                      id="commentContent"
+                      rows="5" cols="60"
+                      th:text="${modifiedComment.commentContent}"></textarea>
+            <br>
+            <button type="submit">Save Changes</button>
+        </form>
+    </body>
+</html>
