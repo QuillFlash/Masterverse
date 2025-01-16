@@ -72,7 +72,8 @@
         </div>
         <small th:text="${{post.getCreatedAt()}}"/>
         <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-        && post.getUserId().getUsername() == #authentication.getName()}">
+        && post.getUserId().getUsername() == #authentication.getName()
+        || #authorization.expression('hasAuthority(''admin'')')}">
             <form th:action="@{/delete_post/{id}(id=${post.getId()})}" method="post">
                 <input type="hidden" name="_method" value="DELETE"/>
                 <button type="button" th:data-id="${post.getId()}"
@@ -119,7 +120,8 @@
             </div>
             <small th:text="${{comment.getCreatedAt()}}"/>
             <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-            && comment.getUserId().getUsername() == #authentication.getName()}">
+            && comment.getUserId().getUsername() == #authentication.getName()
+            || #authorization.expression('hasAuthority(''admin'')')}">
                 <form th:action="@{/delete_comment/{id}(id=${comment.getId()})}" method="post">
                     <input type="hidden" name="_method" value="DELETE"/>
                     <button type="button" th:data-id="${comment.getId()}"
