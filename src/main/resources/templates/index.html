@@ -17,6 +17,12 @@
     </div>
 
     <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/modify_user/{user_id}(user_id=${#authentication.getPrincipal().getId()})}" method="get" style="display: inline;">
+            <button type="submit">Account</button>
+        </form>
+    </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
         <form th:action="@{/logout}" method="post" style="display: inline;">
             <button type="submit">Logout</button>
         </form>

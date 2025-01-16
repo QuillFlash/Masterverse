@@ -35,4 +35,10 @@ public class UsersService
     {
         iUsersRepository.save(user);
     }
+
+    @Transactional
+    public void deleteUserAccount(Users user)
+    {
+        iUsersRepository.delete(user);
+    }
 }

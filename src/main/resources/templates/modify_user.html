@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Masterverse - User Profile</title>
+    <script src="/JavaScript/confirmation.js" defer></script>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+<body>
+    <h2>User Profile</h2>
+    <br>
+    <img th:src="@{/images/profile_picture_{id}.jpg(id=${modifiedUser.getId()})}"
+         alt="Profile picture" width="200" height="200">
+    <p><span th:text="${modifiedUser.getUsername()}"></span></p>
+    <p><span th:text="${modifiedUser.getEmail()}"></span></p>
+    <form th:action="@{/modify_user/{id}(id=${modifiedUser.getId()})}"
+          method="post"
+          enctype="multipart/form-data"
+          th:object="${modifiedUser}">
+        <input type="hidden" name="_method" value="PUT"/>
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <br>
+        <div>
+            <label for="profilePicture">Upload profile picture (format: JPG):</label><br/>
+            <input type="file" id="profilePicture" name="uploadedProfilePicture"/>
+        </div>
+        <br>
+        <button type="submit">Save Changes</button>
+        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+        && modifiedUser.getUsername() == #authentication.getName()
+        || #authorization.expression('hasAuthority(''admin'')')}">
+            <form th:action="@{/delete_user_account/{id}(id=${modifiedUser.getId()})}" method="post">
+                <input type="hidden" name="_method" value="DELETE"/>
+                <button type="button" th:data-id="${modifiedUser.getId()}"
+                        th:onclick="confirmAccountDeletion(this.getAttribute('data-id'))">Delete
+                </button>
+            </form>
+        </div>
+    </form>
+</body>
+</html>

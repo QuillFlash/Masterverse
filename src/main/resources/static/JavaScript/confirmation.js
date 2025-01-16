@@ -71,15 +71,22 @@ function confirmAccountDeletion(account_id)
         {
             headers[csrfHeader] = csrfToken;
         }
-        fetch(`/delete_account/${account_id}`, {method: 'DELETE', headers: headers})
-            .then(response =>
+        fetch(`/delete_user_account/${account_id}`,
+            {method: 'DELETE',
+                headers: headers})
+        .then(response =>
+        {
+            console.log('Response status:', response.status, 'Location header:', response.headers.get('Location'));
+            if (response.ok)
             {
-                location.reload();
-                return false
-            })
+                location.replace("/");
+                return false;
+            }
+        })
         .catch(error =>
         {
-            console.error('Error during deletion:', error);
+            location.replace("/");
+            return false;
         });
     }
 }

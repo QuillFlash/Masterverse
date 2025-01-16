@@ -1,7 +1,9 @@
 package org.keretrendszer.beadando.masterverse.controller;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.CommentDataRequestHelper;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.PostDataRequestHelper;
+import org.keretrendszer.beadando.masterverse.db_read_helpers.ValidationHelper;
 import org.keretrendszer.beadando.masterverse.model.Comment;
 import org.keretrendszer.beadando.masterverse.model.Posts;
 import org.keretrendszer.beadando.masterverse.model.Roles;
@@ -12,10 +14,13 @@ import org.keretrendszer.beadando.masterverse.service.PostsService;
 import org.keretrendszer.beadando.masterverse.service.RolesService;
 import org.keretrendszer.beadando.masterverse.service.UsersService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -113,7 +118,16 @@ public class UsersController
         return "register_admin";
     }
 
-    @PostMapping({"first_setup", "/register", "register_admin"})
+    @GetMapping("/modify_user/{user_id}")
+    public String showModifyUserForm(@PathVariable("user_id") long userId, Model model)
+    {
+        Users user = usersService.getUserById(userId);
+        if (user == null) return "redirect:/error/404";
+        model.addAttribute("modifiedUser", user);
+        return "modify_user";
+    }
+
+    @PostMapping({"first_setup", "/register", "/register_admin"})
     public String registerUser(@ModelAttribute Users user, @RequestParam String role)
     {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -122,6 +136,47 @@ public class UsersController
         else assignedRole = rolesService.getRoleById(2); // user szerepkör
         user.getRoles().add(assignedRole);
         usersService.saveUser(user);
+        return "redirect:/";
+    }
+
+    @PutMapping("/modify_user/{user_id}")
+    public String modifyUser(@ModelAttribute Users user,
+                             @PathVariable("user_id") long userId,
+                             @RequestParam(name = "uploadedProfilePicture", required = false)
+                             List<MultipartFile> uploadedProfilePicture,
+                             @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    throws IOException
+    {
+        if (currentUser == null) return "redirect:/error/404";
+        Users existingUser = usersService.getUserById(userId);
+        if (user.getUsername() != null && !user.getUsername().isEmpty())
+            existingUser.setUsername(user.getUsername());
+        if (user.getEmail() != null && !user.getEmail().isEmpty())
+            existingUser.setEmail(user.getEmail());
+        if (user.getPassword() != null && !user.getPassword().isEmpty())
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (uploadedProfilePicture != null && !uploadedProfilePicture.isEmpty())
+        {
+            for (MultipartFile profilePicture : uploadedProfilePicture)
+                existingUser.setProfilePicture(profilePicture.getBytes());
+        }
+        usersService.saveUser(existingUser);
+        return "redirect:/modify_user/{user_id}";
+    }
+
+    @DeleteMapping("/delete_user_account/{user_id}")
+    public String deleteAccount(@PathVariable("user_id") long userId,
+                                @AuthenticationPrincipal MasterverseUserDetails currentUser,
+                                HttpServletRequest request)
+    {
+        if (currentUser == null) return "redirect:/error/404";
+        Users userToDelete = usersService.getUserById(userId);
+        ValidationHelper validationHelper = new ValidationHelper();
+        validationHelper.validateUserExistence(userToDelete);
+        usersService.deleteUserAccount(userToDelete);
+        HttpSession session = request.getSession(false);
+        if (session != null) session.invalidate();
+        SecurityContextHolder.clearContext();
         return "redirect:/";
     }
 }

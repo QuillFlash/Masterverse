@@ -43,6 +43,12 @@ public class PostsController
     public String getAllPostsAndComments(Model model,
                                          @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
+        /*if (currentUser != null)
+        {
+            long userId = currentUser.getId();
+            Users existingUser = usersService.getUserById(userId);
+            model.addAttribute("existingUser", existingUser);
+        }*/
         List<Posts> allPosts = postsService.getAllPosts();
         List<Comment> allComments = commentsService.getAllComments();
         Map<String, Object> processedPostData = postDataRequestHelper.processPostsData(allPosts, currentUser);
