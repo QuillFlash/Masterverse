@@ -4,6 +4,8 @@
         <meta charset="UTF-8">
         <title>Masterverse - Profile</title>
         <script src="/JavaScript/confirmation.js"></script>
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     </head>
     <body>
         <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
@@ -60,7 +62,7 @@
                     <form th:action="@{/delete_post/{id}(id=${post.getId()})}" method="post">
                         <input type="hidden" name="_method" value="DELETE"/>
                         <button type="button" th:data-id="${post.getId()}"
-                                th:onclick="confirmCommentDeletion(this.getAttribute('data-id'))">Delete
+                                th:onclick="confirmPostDeletion(this.getAttribute('data-id'))">Delete
                         </button>
                     </form>
                 </div>

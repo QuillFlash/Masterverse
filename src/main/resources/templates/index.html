@@ -76,7 +76,7 @@
             <form th:action="@{/delete_post/{id}(id=${post.getId()})}" method="post">
                 <input type="hidden" name="_method" value="DELETE"/>
                 <button type="button" th:data-id="${post.getId()}"
-                        th:onclick="confirmCommentDeletion(this.getAttribute('data-id'))">Delete
+                        th:onclick="confirmPostDeletion(this.getAttribute('data-id'))">Delete
                 </button>
             </form>
         </div>
