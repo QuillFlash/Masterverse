@@ -20,6 +20,11 @@ public class UsersService
         return iUsersRepository.findAll();
     }
 
+    public long countUsers()
+    {
+        return iUsersRepository.count();
+    }
+
     public Users getUserById(long id)
     {
         return iUsersRepository.findById(id).orElse(null);
