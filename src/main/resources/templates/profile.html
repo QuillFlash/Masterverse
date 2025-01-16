@@ -26,6 +26,13 @@
             </form>
         </div>
 
+        <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
+            <form th:action="@{/register_admin}" method="get">
+                <input type="hidden" name="role" value="admin"/>
+                <button type="submit">Register an Admin</button>
+            </form>
+        </div>
+
         <h1 th:text="${user.getUsername()}"/>
         <small th:text="'Account created at: ' + ${{user.getCreatedAt()}}"/>
 

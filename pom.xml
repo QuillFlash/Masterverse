@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.keretrendszer.beadando</groupId>
     <artifactId>masterverse</artifactId>
-    <version>0.43-ALPHA2</version>
+    <version>0.45-ALPHA3</version>
     <name>masterverse</name>
     <description>masterverse</description>
     <url/>

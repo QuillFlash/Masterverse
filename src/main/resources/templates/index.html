@@ -28,6 +28,12 @@
         </form>
     </div>
 
+    <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
+        <form th:action="@{/register_admin}" method="get">
+            <button type="submit">Register an Admin</button>
+        </form>
+    </div>
+
     <a th:href="@{/users}">All Users</a>
 
     <div th:each="post : ${posts}">

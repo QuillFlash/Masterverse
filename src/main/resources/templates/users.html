@@ -16,6 +16,14 @@
             <button type="submit">Logout</button>
         </form>
     </div>
+
+    <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
+        <form th:action="@{/register_admin}" method="get">
+            <input type="hidden" name="role" value="admin"/>
+            <button type="submit">Register an Admin</button>
+        </form>
+    </div>
+
     <h1>Registered Users</h1>
     <ul>
         <li th:each="user : ${users}">

@@ -1,4 +1,5 @@
 package org.keretrendszer.beadando.masterverse.controller;
+import jakarta.servlet.http.HttpServletRequest;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.CommentDataRequestHelper;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.PostDataRequestHelper;
 import org.keretrendszer.beadando.masterverse.model.Comment;
@@ -14,10 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
@@ -99,13 +97,31 @@ public class UsersController
         return "register";
     }
 
-    @PostMapping("/register")
-    public String registerUser(@ModelAttribute Users user)
+    @GetMapping("/first_setup")
+    public String showFirstSetupRegistrationForm(Model model)
+    {
+        model.addAttribute("user", new Users());
+        long userCount = usersService.getAllUsers().size();
+        if (userCount == 0) return "first_setup";
+        return "redirect:/";
+    }
+
+    @GetMapping("/register_admin")
+    public String showAdminRegistrationForm(Model model)
+    {
+        model.addAttribute("user", new Users());
+        return "register_admin";
+    }
+
+    @PostMapping({"first_setup", "/register", "register_admin"})
+    public String registerUser(@ModelAttribute Users user, @RequestParam String role)
     {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Roles userRole = rolesService.getRoleById(2); // id: 2 = "user" szerepkör; szándékos a kódba égetés
-        user.getRoles().add(userRole);
+        Roles assignedRole;
+        if ("admin".equalsIgnoreCase(role)) assignedRole = rolesService.getRoleById(1); // admin szerepkör
+        else assignedRole = rolesService.getRoleById(2); // user szerepkör
+        user.getRoles().add(assignedRole);
         usersService.saveUser(user);
-        return "redirect:/login";
+        return "redirect:/";
     }
 }
