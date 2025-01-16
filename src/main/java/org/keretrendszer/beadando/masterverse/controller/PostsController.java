@@ -94,7 +94,7 @@ public class PostsController
         {
             for (MultipartFile postImage : postImages)
             {
-                if (!postImage.isEmpty())
+                if (! postImage.isEmpty())
                 {
                     PostImages databaseSlotForImage = new PostImages();
                     databaseSlotForImage.setPostId(post);
@@ -127,6 +127,24 @@ public class PostsController
         existingPost.setPostContent(postNewContent);
         existingPost.setUserId(existingPost.getUserId());
         postsService.savePost(existingPost);
+        return "redirect:/";
+    }
+
+    @DeleteMapping("/delete_post/{post_id}")
+    public String deletePost(@PathVariable("post_id") long postId,
+                             @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    {
+        if (currentUser == null)
+        {
+            throw new RuntimeException("ERROR: You must be logged in to delete a post.");
+        }
+        long userId = currentUser.getId();
+        Users loggedInUser = usersService.getUserById(userId);
+        Posts existingPost = postsService.getAPostById(postId);
+        ValidationHelper validationHelper = new ValidationHelper();
+        validationHelper.validateUserExistence(loggedInUser);
+        validationHelper.validatePermissions(loggedInUser, existingPost.getUserId(), "post");
+        postsService.deletePost(existingPost);
         return "redirect:/";
     }
 }

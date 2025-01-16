@@ -114,4 +114,22 @@ public class CommentsController
         commentsService.saveComment(existingComment);
         return "redirect:/";
     }
+
+    @DeleteMapping("/delete_comment/{comment_id}")
+    public String deleteComment(@PathVariable("comment_id") long commentId,
+                                @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    {
+        if (currentUser == null)
+        {
+            throw new RuntimeException("ERROR: You must be logged in to delete a comment.");
+        }
+        long userId = currentUser.getId();
+        Users loggedInUser = usersService.getUserById(userId);
+        Comment existingComment = commentsService.getACommentById(commentId);
+        ValidationHelper validationHelper = new ValidationHelper();
+        validationHelper.validateUserExistence(loggedInUser);
+        validationHelper.validatePermissions(loggedInUser, existingComment.getUserId(), "comment");
+        commentsService.deleteComment(existingComment);
+        return "redirect:/";
+    }
 }

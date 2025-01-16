@@ -46,6 +46,16 @@ public class Users
             orphanRemoval = true)
     private List<Comment> userComments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "userId",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<PostLikes> postLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userId",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<CommentLikes> commentLikes = new ArrayList<>();
+
     @OneToMany(mappedBy = "followed",
             cascade = {CascadeType.ALL},
             orphanRemoval = true)
@@ -139,6 +149,26 @@ public class Users
     public void setUserComments(List<Comment> userComments)
     {
         this.userComments = userComments;
+    }
+
+    public List<PostLikes> getPostLikes()
+    {
+        return postLikes;
+    }
+
+    public void setPostLikes(List<PostLikes> postLikes)
+    {
+        this.postLikes = postLikes;
+    }
+
+    public List<CommentLikes> getCommentLikes()
+    {
+        return commentLikes;
+    }
+
+    public void setCommentLikes(List<CommentLikes> commentLikes)
+    {
+        this.commentLikes = commentLikes;
     }
 
     public List<FollowFlow> getFollowers()

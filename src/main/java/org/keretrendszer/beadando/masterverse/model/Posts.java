@@ -37,6 +37,9 @@ public class Posts
     private List<PostImages> postImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLikes> postLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     public Posts() {}
@@ -102,6 +105,16 @@ public class Posts
     public List<PostImages> getPostImages()
     {
         return postImages;
+    }
+
+    public List<PostLikes> getPostLikes()
+    {
+        return postLikes;
+    }
+
+    public void setPostLikes(List<PostLikes> postLikes)
+    {
+        this.postLikes = postLikes;
     }
 
     @Override

@@ -74,7 +74,7 @@ public class PostsService
     @Transactional
     public void likePost(long postId, long userId)
     {
-        if (!hasUserLikedAPost(postId, userId))
+        if (! hasUserLikedAPost(postId, userId))
         {
             Posts post = iPostsRepository.findById(postId).orElse(null);
             Users user = iUsersRepository.findById(userId).orElse(null);
@@ -95,5 +95,11 @@ public class PostsService
     public void savePost(Posts post)
     {
         iPostsRepository.save(post);
+    }
+
+    @Transactional
+    public void deletePost(Posts post)
+    {
+        iPostsRepository.delete(post);
     }
 }

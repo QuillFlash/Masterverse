@@ -29,6 +29,9 @@ public class Comment
     @OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentImages> commentImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentLikes> commentLikes = new ArrayList<>();
+
     @Column(name = "comment_content", nullable = false)
     private String commentContent;
 
@@ -82,6 +85,16 @@ public class Comment
     public void setCommentImages(List<CommentImages> commentImages)
     {
         this.commentImages = commentImages;
+    }
+
+    public List<CommentLikes> getCommentLikes()
+    {
+        return commentLikes;
+    }
+
+    public void setCommentLikes(List<CommentLikes> commentLikes)
+    {
+        this.commentLikes = commentLikes;
     }
 
     public String getCommentContent()

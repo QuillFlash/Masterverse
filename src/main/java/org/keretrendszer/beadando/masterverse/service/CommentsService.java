@@ -91,4 +91,10 @@ public class CommentsService
     {
         iCommentRepository.save(comment);
     }
+
+    @Transactional
+    public void deleteComment(Comment comment)
+    {
+        iCommentRepository.delete(comment);
+    }
 }

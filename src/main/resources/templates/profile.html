@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Masterverse - Profile</title>
+        <script src="/JavaScript/confirmation.js"></script>
     </head>
     <body>
         <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
@@ -54,6 +55,15 @@
                     </div>
                 </div>
                 <small th:text="${{post.getCreatedAt()}}"/>
+                <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+                && post.getUserId().getUsername() == #authentication.getName()}">
+                    <form th:action="@{/delete_post/{id}(id=${post.getId()})}" method="post">
+                        <input type="hidden" name="_method" value="DELETE"/>
+                        <button type="button" th:data-id="${post.getId()}"
+                                th:onclick="confirmCommentDeletion(this.getAttribute('data-id'))">Delete
+                        </button>
+                    </form>
+                </div>
 
                 <hr style="height: 1px; background-color: black; width: 25%;">
 
@@ -72,7 +82,8 @@
                                 <button type="submit">Like</button>
                             </form>
                         </div>
-                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+                        && comment.getUserId().getUsername() != #authentication.getName()}">
                             <form th:action="@{/comments/{id}/like(id=${comment.getId()})}" method="post">
                                 <button type="submit">Like</button>
                             </form>
@@ -91,6 +102,15 @@
                         </form>
                     </div>
                     <small th:text="${{comment.getCreatedAt()}}"/>
+                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+                    && comment.getUserId().getUsername() == #authentication.getName()}">
+                        <form th:action="@{/delete_comment/{id}(id=${comment.getId()})}" method="post">
+                            <input type="hidden" name="_method" value="DELETE"/>
+                            <button type="button" th:data-id="${comment.getId()}"
+                                    th:onclick="confirmCommentDeletion(this.getAttribute('data-id'))">Delete
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </li>
         </ul>
