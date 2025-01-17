@@ -6,23 +6,39 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <title>Masterverse - Share What's On Your Mind</title>
 </head>
-  <body>
-    <h1>Post something on Masterverse!</h1>
-    <form th:action="@{/create_post}"
-          method="post"
-          enctype="multipart/form-data"
-          th:object="${post}">
-      <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-      <label hidden="hidden" for="post_box"></label>
-      <textarea id="post_box" name="post_box" th:field="*{postContent}" rows="5"
-      cols="60" placeholder="Write your post here..." required></textarea>
-      <div>
-        <label for="post_images">Upload images (format: JPG):</label><br/>
-        <input type="file" id="post_images" name="post_images" multiple />
+<body class="has-background-dark" style="text-decoration: none;">
+<section class="hero is-fullheight has-background-dark">
+  <div class="hero-body">
+    <div class="container">
+      <div class="box" style="max-width: 600px; margin: auto;">
+        <h1 class="title has-text-centered">Post something on Masterverse!</h1>
+        <form th:action="@{/create_post}"
+              method="post"
+              enctype="multipart/form-data"
+              th:object="${post}">
+          <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+          <div class="field">
+            <div class="control">
+              <label hidden="hidden" for="post_box"></label>
+              <textarea id="post_box" name="post_box" th:field="*{postContent}"
+              class="textarea" rows="5" placeholder="Write your post here..." required></textarea>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="post_images">Upload images (format: JPG):</label>
+            <div class="control">
+              <input type="file" id="post_images" name="post_images" class="input" multiple>
+            </div>
+          </div>
+          <div class="field is-grouped is-grouped-centered">
+            <div class="control">
+              <button type="submit" class="button is-primary">Submit</button>
+            </div>
+          </div>
+        </form>
       </div>
-      <div>
-        <button type="submit">Submit</button>
-      </div>
-    </form>
-  </body>
+    </div>
+  </div>
+</section>
+</body>
 </html>

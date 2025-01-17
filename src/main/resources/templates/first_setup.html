@@ -1,25 +1,46 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
-    <title>Masterverse - Get Started!</title>
-  </head>
-  <body>
-    <h3>To get started, let's create the first admin user!</h3>
-    <form th:action="@{/register}" method="post">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required>
-      <br>
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required>
-      <br>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-      <br>
-      <input type="hidden" name="role" value="admin"/>
-      <button type="submit">Register</button>
-    </form>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+        <title>Masterverse - Get Started!</title>
+    </head>
+  <body class="has-background-dark" style="text-decoration: none;">
+      <section class="hero is-fullheight has-background-dark">
+          <div class="hero-body">
+              <div class="container">
+                  <div class="box" style="max-width: 400px; margin: auto;">
+                      <h3 class="title has-text-centered">To get started, let's create the first admin user!</h3>
+                      <form th:action="@{/register}" method="post">
+                          <div class="field">
+                              <label for="username" class="label">Username:</label>
+                              <div class="control">
+                                  <input type="text" id="username" name="username" class="input" required>
+                              </div>
+                          </div>
+                          <div class="field">
+                              <label for="email" class="label">Email:</label>
+                              <div class="control">
+                                  <input type="email" id="email" name="email" class="input" required>
+                              </div>
+                          </div>
+                          <div class="field">
+                              <label for="password" class="label">Password:</label>
+                              <div class="control">
+                                  <input type="password" id="password" name="password" class="input" required>
+                              </div>
+                          </div>
+                          <input type="hidden" name="role" value="admin"/>
+                          <div class="field is-grouped is-grouped-centered">
+                              <div class="control">
+                                  <button type="submit" class="button is-primary">Register</button>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </section>
   </body>
 </html>

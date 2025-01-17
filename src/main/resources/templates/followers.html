@@ -4,45 +4,144 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
         <title>Masterverse - Your Followers</title>
     </head>
-    <body>
-        <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
-            <form th:action="@{/login}" method="get" style="display: inline;">
-                <button type="submit">Login</button>
-            </form>
-        </div>
+    <body class="has-background-dark" style="text-decoration: none;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation"
+             style="background-color: #3c8d3c; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                text-underline: none;">
+            <div class="navbar-brand">
+                <a class="navbar-item" th:href="@{/}">
+                    Masterverse
+                </a>
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="navbar-menu" id="navMenu">
+                <div class="navbar-start">
+                    <!-- Bal oldali menüpontok -->
+                </div>
 
-        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
-            <form th:action="@{/logout}" method="get" style="display: inline;">
-                <button type="submit">Logout</button>
-            </form>
-        </div>
+                <div class="navbar-end" id="navbarEnd">
+                    <div class="navbar-item">
+                        <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
+                            <form th:action="@{/login}" method="post">
+                                <button type="submit" class="button is-text">Login</button>
+                            </form>
+                        </div>
 
-        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
-            <form th:action="@{/followers/{id}(id=${loggedInUserId})}" method="get" style="display: inline;">
-                <button type="submit">Your Followers</button>
-            </form>
-        </div>
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                            <form th:action="@{/modify_user/{user_id}(user_id=${#authentication.getPrincipal().getId()})}" method="get">
+                                <button type="submit" class="button is-text">Account</button>
+                            </form>
+                        </div>
 
-        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
-            <form th:action="@{/followed_users/{id}(id=${loggedInUserId})}" method="get" style="display: inline;">
-                <button type="submit">Your Follows</button>
-            </form>
-        </div>
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                            <form th:action="@{/followers/{id}(id=${loggedInUserId})}" method="get">
+                                <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Your Followers</button>
+                            </form>
+                        </div>
 
-        <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
-            <form th:action="@{/register_admin}" method="get">
-                <input type="hidden" name="role" value="admin"/>
-                <button type="submit">Register an Admin</button>
-            </form>
-        </div>
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                            <form th:action="@{/followed_users/{id}(id=${loggedInUserId})}" method="get">
+                                <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Your Follows</button>
+                            </form>
+                        </div>
 
-        <h1>Users Who Follow You</h1>
-        <ul>
-            <li th:each="follower : ${followers}">
-                <a th:href="@{/users/{id}/profile(id=${follower.getId()})}" th:text="${follower.getUsername()}"></a>
-            </li>
-        </ul>
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                            <form th:action="@{/create_post}" method="get">
+                                <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Post something</button>
+                            </form>
+                        </div>
+
+                        <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
+                            <form th:action="@{/register_admin}" method="get">
+                                <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Register an Admin</button>
+                            </form>
+                        </div>
+
+                        <div class="navbar-item">
+                            <form th:action="@{/users}" method="get">
+                                <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Users</button>
+                            </form>
+                        </div>
+
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="button is-text">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="columns" id="controlPanel">
+            <aside class="column is-one-quarter is-hidden-mobile">
+                <div class="box has-background-dark" style="border: none; text-underline: none;">
+                    <h2 class="title is-5 has-text-light">Menu</h2>
+
+                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                        <form th:action="@{/followers/{id}(id=${loggedInUserId})}" method="get">
+                            <button type="submit" class="button is-text">Your Followers</button>
+                        </form>
+                    </div>
+
+                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                        <form th:action="@{/followed_users/{id}(id=${loggedInUserId})}" method="get">
+                            <button type="submit" class="button is-text">Your Follows</button>
+                        </form>
+                    </div>
+
+                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                        <form th:action="@{/create_post}" method="get">
+                            <button type="submit" class="button is-text">Post something</button>
+                        </form>
+                    </div>
+
+                    <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
+                        <form th:action="@{/register_admin}" method="get">
+                            <button type="submit" class="button is-text">Register an Admin</button>
+                        </form>
+                    </div>
+
+                    <div class="navbar-item">
+                        <form th:action="@{/users}" method="get">
+                            <button type="submit" class="button is-text">Users</button>
+                        </form>
+                    </div>
+                </div>
+            </aside>
+            <main class="column is-half">
+                <section class="section">
+                    <div th:each="follower : ${followers}">
+                        <a th:href="@{/users/{id}/profile(id=${follower.getId()})}" th:text="${follower.getUsername()}"></a>
+                    </div>
+                </section>
+            </main>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', () =>
+            {
+                const burger = document.querySelector('.navbar-burger');
+                const targetId = burger.dataset.target;
+                const targetElement = document.getElementById(targetId);
+                burger.addEventListener('click', () =>
+                {
+                    burger.classList.toggle('is-active');
+                    targetElement.classList.toggle('is-active');
+                });
+            });
+        </script>
     </body>
 </html>

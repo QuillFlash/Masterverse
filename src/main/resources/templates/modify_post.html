@@ -6,21 +6,39 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
     <title>Masterverse - Modify Your Post</title>
 </head>
-    <body>
-        <h1>Modify your post</h1>
-        <form th:action="@{/modify_post/{id}(id=${modifiedPost.getId()})}"
-              method="post"
-              enctype="multipart/form-data"
-              th:object="${modifiedPost}">
-            <input type="hidden" name="_method" value="PUT"/>
-            <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-            <label hidden="hidden" for="postContent"></label>
-            <textarea name="postContent"
-                      id="postContent"
-                      rows="5" cols="60"
-                      th:text="${modifiedPost.postContent}"></textarea>
-            <br>
-            <button type="submit">Save Changes</button>
-        </form>
-    </body>
+<body class="has-background-dark" style="text-decoration: none;">
+<section class="hero is-fullheight has-background-dark">
+    <div class="hero-body">
+        <div class="container">
+            <div class="box" style="max-width: 600px; margin: auto;">
+                <h1 class="title has-text-centered">Modify your post</h1>
+                <form th:action="@{/modify_post/{id}(id=${modifiedPost.getId()})}"
+                      method="post"
+                      enctype="multipart/form-data"
+                      th:object="${modifiedPost}">
+                    <input type="hidden" name="_method" value="PUT"/>
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                    <div class="field">
+                        <div class="control">
+                            <label hidden="hidden" for="postContent"></label>
+                            <textarea name="postContent"
+                               id="postContent"
+                               class="textarea"
+                               rows="5"
+                               placeholder="Edit your post..."
+                               th:text="${modifiedPost.postContent}">
+                            </textarea>
+                        </div>
+                    </div>
+                    <div class="field is-grouped is-grouped-centered">
+                        <div class="control">
+                            <button type="submit" class="button is-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
 </html>

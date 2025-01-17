@@ -6,23 +6,39 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <title>Masterverse - React to a Post</title>
 </head>
-  <body>
-    <h1>Tell everyone how you feel about a post!</h1>
-    <form th:action="@{/posts/{post_id}/create_comment(post_id=${post_id})}"
-          method="post"
-          enctype="multipart/form-data"
-          th:object="${comment}">
-      <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-      <label hidden="hidden" for="comment_box"></label>
-      <textarea id="comment_box" name="comment_box" th:field="*{commentContent}" rows="5"
-      cols="60" placeholder="Write your comment here..." required></textarea>
-      <div>
-        <label for="comment_images">Upload images (format: JPG):</label><br/>
-        <input type="file" id="comment_images" name="uploadedCommentImages" multiple />
+<body class="has-background-dark" style="text-decoration: none;">
+<section class="hero is-fullheight has-background-dark">
+  <div class="hero-body">
+    <div class="container">
+      <div class="box" style="max-width: 600px; margin: auto;">
+        <h1 class="title has-text-centered">Tell everyone how you feel about a post!</h1>
+        <form th:action="@{/posts/{post_id}/create_comment(post_id=${post_id})}"
+              method="post"
+              enctype="multipart/form-data"
+              th:object="${comment}">
+          <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+          <div class="field">
+            <div class="control">
+              <label hidden="hidden" for="comment_box"></label>
+              <textarea id="comment_box" name="comment_box" th:field="*{commentContent}"
+              class="textarea" rows="5" placeholder="Write your comment here..." required></textarea>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="comment_images">Upload images (format: JPG):</label>
+            <div class="control">
+              <input type="file" id="comment_images" name="uploadedCommentImages" class="input" multiple>
+            </div>
+          </div>
+          <div class="field is-grouped is-grouped-centered">
+            <div class="control">
+              <button type="submit" class="button is-primary">Submit</button>
+            </div>
+          </div>
+        </form>
       </div>
-      <div>
-        <button type="submit">Submit</button>
-      </div>
-    </form>
-  </body>
+    </div>
+  </div>
+</section>
+</body>
 </html>

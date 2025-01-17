@@ -9,44 +9,76 @@
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
-<body>
-    <h2>User Profile</h2>
-    <br>
-    <img th:src="@{/images/profile_picture_{id}.jpg(id=${modifiedUser.getId()})}"
-         alt="Profile picture" width="200" height="200">
-    <p><span th:text="${modifiedUser.getUsername()}"></span></p>
-    <p><span th:text="${modifiedUser.getEmail()}"></span></p>
-    <form th:action="@{/modify_user/{id}(id=${modifiedUser.getId()})}"
-          method="post"
-          enctype="multipart/form-data"
-          th:object="${modifiedUser}">
-        <input type="hidden" name="_method" value="PUT"/>
-        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username">
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email">
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password">
-        <br>
-        <div>
-            <label for="profilePicture">Upload profile picture (format: JPG):</label><br/>
-            <input type="file" id="profilePicture" name="uploadedProfilePicture"/>
+<body class="has-background-dark" style="text-decoration: none;">
+<section class="hero is-fullheight has-background-dark">
+    <div class="hero-body">
+        <div class="container">
+            <div class="box" style="max-width: 600px; margin: auto;">
+                <h2 class="title has-text-centered">User Profile</h2>
+                <figure class="image is-128x128" style="margin: auto;">
+                    <img th:src="@{/images/profile_picture_{id}.jpg(id=${modifiedUser.getId()})}"
+                         alt="Profile picture">
+                </figure>
+                <p class="has-text-centered">
+                    <span th:text="${modifiedUser.getUsername()}"></span><br>
+                    <span th:text="${modifiedUser.getEmail()}"></span>
+                </p>
+                <form th:action="@{/modify_user/{id}(id=${modifiedUser.getId()})}"
+                      method="post"
+                      enctype="multipart/form-data"
+                      th:object="${modifiedUser}">
+                    <input type="hidden" name="_method" value="PUT"/>
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                    <div class="field">
+                        <label for="username" class="label">Username:</label>
+                        <div class="control">
+                            <input type="text" id="username" name="username" class="input" placeholder="Username">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="email" class="label">Email:</label>
+                        <div class="control">
+                            <input type="email" id="email" name="email" class="input" placeholder="Email">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="password" class="label">Password:</label>
+                        <div class="control">
+                            <input type="password" id="password" name="password" class="input" placeholder="Password">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="profilePicture" class="label">Upload profile picture (format: JPG):</label>
+                        <div class="control">
+                            <input type="file" id="profilePicture" name="uploadedProfilePicture" class="input">
+                        </div>
+                    </div>
+                    <div class="field is-grouped is-grouped-centered">
+                        <div class="control">
+                            <button type="submit" class="button is-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+                <br>
+                <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+                       && modifiedUser.getUsername() == #authentication.getName()
+                       || #authorization.expression('hasAuthority(''admin'')')}">
+                    <form th:action="@{/delete_user_account/{id}(id=${modifiedUser.getId()})}" method="post">
+                        <input type="hidden" name="_method" value="DELETE"/>
+                        <div class="field is-grouped is-grouped-centered">
+                            <div class="control">
+                                <button type="button" class="button is-danger"
+                                        th:data-id="${modifiedUser.getId()}"
+                                        th:onclick="confirmAccountDeletion(this.getAttribute('data-id'))">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <br>
-        <button type="submit">Save Changes</button>
-        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-        && modifiedUser.getUsername() == #authentication.getName()
-        || #authorization.expression('hasAuthority(''admin'')')}">
-            <form th:action="@{/delete_user_account/{id}(id=${modifiedUser.getId()})}" method="post">
-                <input type="hidden" name="_method" value="DELETE"/>
-                <button type="button" th:data-id="${modifiedUser.getId()}"
-                        th:onclick="confirmAccountDeletion(this.getAttribute('data-id'))">Delete
-                </button>
-            </form>
-        </div>
-    </form>
+    </div>
+</section>
 </body>
 </html>
