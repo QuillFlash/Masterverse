@@ -63,9 +63,12 @@ public class UsersController
                             @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         List<Users> allUsers = usersService.getAllUsers();
-        long loggedInUser = currentUser.getId();
+        if (currentUser != null)
+        {
+            long loggedInUser = currentUser.getId();
+            model.addAttribute("loggedInUser", loggedInUser);
+        }
         model.addAttribute("users", allUsers);
-        model.addAttribute("loggedInUser", loggedInUser);
         return "users";
     }
 

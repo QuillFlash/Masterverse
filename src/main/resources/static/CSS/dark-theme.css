@@ -1,0 +1,58 @@
+/* dark-theme.css */
+
+html, body
+{
+    background-color: #262424;
+    color: #e0e0e0;
+}
+
+#navbarEnd button.is-text, #controlPanel button.is-text
+{
+    border: none;
+    text-underline: none;
+}
+
+.navbar
+{
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.navbar,
+.navbar-menu
+{
+    background-color: #3c8d3c !important;
+}
+
+.navbar.is-dark,
+.navbar-menu.is-dark
+{
+    background-color: #3c8d3c !important;
+}
+
+.button.is-dark
+{
+    background-color: #262424;
+    color: #e0e0e0;
+    border-color: #ffffff;
+}
+
+.button.is-dark:hover
+{
+    background-color: #525252;
+}
+
+.button.is-text
+{
+    text-decoration: none;
+}
+
+img
+{
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.has-background-dark
+{
+    background-color: #424242;
+}

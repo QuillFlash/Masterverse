@@ -2,158 +2,264 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
         <title>Masterverse - Profile</title>
         <script src="/JavaScript/confirmation.js"></script>
         <meta name="_csrf" th:content="${_csrf.token}" />
         <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     </head>
-    <body>
-        <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
-            <form th:action="@{/login}" method="post" style="display: inline;">
-                <button type="submit">Login</button>
-            </form>
-        </div>
-
-        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
-            <form th:action="@{/logout}" method="post" style="display: inline;">
-                <button type="submit">Logout</button>
-            </form>
-        </div>
-
-        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
-            <form th:action="@{/followers/{id}(id=${currentUser.getId()})}" method="get" style="display: inline;">
-                <button type="submit">Your Followers</button>
-            </form>
-        </div>
-
-        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
-            <form th:action="@{/followed_users/{id}(id=${currentUser.getId()})}" method="get" style="display: inline;">
-                <button type="submit">Your Follows</button>
-            </form>
-        </div>
-
-        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
-            <form th:action="@{/create_post}" method="get" style="display: inline;">
-                <button type="submit">Post something</button>
-            </form>
-        </div>
-
-        <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
-            <form th:action="@{/register_admin}" method="get">
-                <input type="hidden" name="role" value="admin"/>
-                <button type="submit">Register an Admin</button>
-            </form>
-        </div>
-
-        <h1 th:text="${user.getUsername()}"/>
-        <small th:text="'Account created at: ' + ${{user.getCreatedAt()}}"/>
-        <br>
-        <small th:text="'Follower count: ' + ${{followerCount}}"/>
-        <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser'
-        && !isUserFollowingOthers}">
-            <form th:action="@{/users/{id}/follow(id=${user.getId()})}" method="post">
-                <button type="submit">Follow</button>
-            </form>
-        </div>
-
-        <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser'
-        && isUserFollowingOthers}">
-            <form th:action="@{/users/{id}/unfollow(id=${user.getId()})}" method="post">
-                <button type="submit">Unfollow</button>
-            </form>
-        </div>
-
-        <h2>Posts</h2>
-        <ul>
-            <li th:each="post : ${posts}">
-                <p th:text="${post.getPostContent()}"/>
-                <div th:each="image : ${post.getPostImages()}">
-                    <img th:src="@{/images/post_image_{id}.jpg(id=${image.getId()})}" alt="Post image">
+        <body class="has-background-dark" style="text-decoration: none;">
+            <nav class="navbar is-dark" role="navigation" aria-label="main navigation"
+                 style="background-color: #3c8d3c; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                text-underline: none;">
+                <div class="navbar-brand">
+                    <a class="navbar-item" th:href="@{/}">
+                        Masterverse
+                    </a>
+                    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
                 </div>
-                <p>
-                    <span th:text="${likesForUsersPosts.get(post.getId())} + ' likes'"/>
-                </p>
-                <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser'}">
-                    <div th:if="${!hasUserLikedAPost.get(post.getId()) && currentUser != null}">
-                        <form th:action="@{/posts/{postId}/like(postId=${post.getId()})}" method="post">
-                            <button type="submit">Like</button>
-                        </form>
-                        <div th:if="${post.getUserId().getUsername() == currentUser.username}">
-                            <form th:action="@{/modify_post/{id}(id=${post.getId()})}" method="get">
-                                <button type="submit">Edit</button>
+                <div class="navbar-menu" id="navMenu">
+                    <div class="navbar-start">
+                        <!-- Bal oldali menüpontok -->
+                    </div>
+
+                    <div class="navbar-end" id="navbarEnd">
+                        <div class="navbar-item">
+                            <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
+                                <form th:action="@{/login}" method="post">
+                                    <button type="submit" class="button is-text">Login</button>
+                                </form>
+                            </div>
+
+                            <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                                <form th:action="@{/modify_user/{user_id}(user_id=${#authentication.getPrincipal().getId()})}" method="get">
+                                    <button type="submit" class="button is-text">Account</button>
+                                </form>
+                            </div>
+
+                            <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                                <form th:action="@{/followers/{id}(id=${loggedInUserId})}" method="get">
+                                    <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Your Followers</button>
+                                </form>
+                            </div>
+
+                            <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                                <form th:action="@{/followed_users/{id}(id=${loggedInUserId})}" method="get">
+                                    <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Your Follows</button>
+                                </form>
+                            </div>
+
+                            <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                                <form th:action="@{/create_post}" method="get">
+                                    <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Post something</button>
+                                </form>
+                            </div>
+
+                            <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
+                                <form th:action="@{/register_admin}" method="get">
+                                    <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Register an Admin</button>
+                                </form>
+                            </div>
+
+                            <div class="navbar-item">
+                                <form th:action="@{/users}" method="get">
+                                    <button type="submit" class="button is-text is-hidden-desktop is-hidden-tablet">Users</button>
+                                </form>
+                            </div>
+
+                            <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                                <form th:action="@{/logout}" method="post">
+                                    <button type="submit" class="button is-text">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="columns" id="controlPanel">
+                <aside class="column is-one-quarter is-hidden-mobile">
+                    <div class="box has-background-dark" style="border: none; text-underline: none;">
+                        <h2 class="title is-5 has-text-light">Menu</h2>
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                            <form th:action="@{/followers/{id}(id=${loggedInUserId})}" method="get">
+                                <button type="submit" class="button is-text">Your Followers</button>
+                            </form>
+                        </div>
+
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                            <form th:action="@{/followed_users/{id}(id=${loggedInUserId})}" method="get">
+                                <button type="submit" class="button is-text">Your Follows</button>
+                            </form>
+                        </div>
+
+                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                            <form th:action="@{/create_post}" method="get">
+                                <button type="submit" class="button is-text">Post something</button>
+                            </form>
+                        </div>
+
+                        <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
+                            <form th:action="@{/register_admin}" method="get">
+                                <button type="submit" class="button is-text">Register an Admin</button>
                             </form>
                         </div>
                     </div>
-                    <div th:if="${hasUserLikedAPost.get(post.getId())}">
-                        <form th:action="@{/posts/{postId}/remove_like(postId=${post.getId()})}" method="post">
-                            <button type="submit">Remove Like</button>
-                        </form>
-                    </div>
-                </div>
-                <small th:text="${{post.getCreatedAt()}}"/>
-                <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-                && post.getUserId().getUsername() == #authentication.getName()
-                || #authorization.expression('hasAuthority(''admin'')')}">
-                    <form th:action="@{/delete_post/{id}(id=${post.getId()})}" method="post">
-                        <input type="hidden" name="_method" value="DELETE"/>
-                        <button type="button" th:data-id="${post.getId()}"
-                                th:onclick="confirmPostDeletion(this.getAttribute('data-id'))">Delete
-                        </button>
-                    </form>
-                </div>
+                </aside>
 
-                <hr style="height: 1px; background-color: black; width: 25%;">
+                <main class="column is-half">
+                    <section class="section">
+                        <h1 class="title" th:text="${user.getUsername()}"/>
+                        <small class="has-text-grey-light" th:text="'Account created at: ' + ${user.getCreatedAt()}"></small>
+                        <br>
+                        <small class="has-text-grey-light" th:text="'Follower count: ' + ${followerCount}"></small>
+                        <div class="buttons">
+                            <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser' && !isUserFollowingOthers}">
+                                <form th:action="@{/users/{id}/follow(id=${user.getId()})}" method="post">
+                                    <button type="submit" class="button is-primary">Follow</button>
+                                </form>
+                            </div>
+                            <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser' && isUserFollowingOthers}">
+                                <form th:action="@{/users/{id}/unfollow(id=${user.getId()})}" method="post">
+                                    <button type="submit" class="button is-warning">Unfollow</button>
+                                </form>
+                            </div>
+                        </div>
 
-                <div th:each="comment : ${post.getComments()}">
-                    <h2 th:text="${comment.getUserId().getUsername()}"/>
-                    <p th:text="${comment.getCommentContent()}"/>
-                    <div th:each="commentImage : ${comment.getCommentImages()}">
-                        <img th:src="@{/images/comment_image_{id}.jpg(id=${commentImage.getId()})}" alt="Comment image">
-                    </div>
-                    <p>
-                        <span th:text="${likesForComments.get(comment.getId())} + ' likes'"/>
-                    </p>
-                    <div th:if="${!hasUserLikedAComment.get(comment.getId())}">
-                        <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
-                            <form th:action="@{/login}" method="get">
-                                <button type="submit">Like</button>
-                            </form>
-                        </div>
-                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-                        && comment.getUserId().getUsername() != #authentication.getName()}">
-                            <form th:action="@{/comments/{id}/like(id=${comment.getId()})}" method="post">
-                                <button type="submit">Like</button>
-                            </form>
-                        </div>
-                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-                        && comment.getUserId().getUsername() == #authentication.getName()}">
-                            <form th:action="@{/modify_comment/{id}(id=${comment.getId()})}" method="get">
-                                <button type="submit">Edit</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-                    && hasUserLikedAComment.get(comment.getId()) == true}">
-                        <form th:action="@{/comments/{id}/remove_like(id=${comment.getId()})}" method="post">
-                            <button type="submit">Remove Like</button>
-                        </form>
-                    </div>
-                    <small th:text="${{comment.getCreatedAt()}}"/>
-                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
-                    && comment.getUserId().getUsername() == #authentication.getName()}">
-                        <form th:action="@{/delete_comment/{id}(id=${comment.getId()})}" method="post">
-                            <input type="hidden" name="_method" value="DELETE"/>
-                            <button type="button" th:data-id="${comment.getId()}"
-                                    th:onclick="confirmCommentDeletion(this.getAttribute('data-id'))">Delete
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </li>
-        </ul>
+                        <h2 class="title is-4">Posts</h2>
+                        <div th:each="post : ${posts}" class="box has-background-dark">
+                            <p class="has-text-light" th:text="${post.getPostContent()}"/>
+                            <div th:each="image : ${post.getPostImages()}">
+                                <figure class="image">
+                                    <img th:src="@{/images/post_image_{id}.jpg(id=${image.getId()})}" alt="Post image">
+                                </figure>
+                            </div>
+                            <p class="has-text-light">
+                                <span th:text="${likesForUsersPosts.get(post.getId())} + ' likes'"/>
+                            </p>
+                            <small class="has-text-grey-light" th:text="${{post.getCreatedAt()}}"></small>
+                            <div class="buttons">
+                                <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
+                                    <form th:action="@{/login}" method="get">
+                                        <button type="submit" class="button is-primary">Like</button>
+                                    </form>
+                                </div>
+                                <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser'}">
+                                    <div th:if="${!hasUserLikedAPost.get(post.getId()) && currentUser != null}">
+                                        <form th:action="@{/posts/{postId}/like(postId=${post.getId()})}" method="post">
+                                            <button type="submit" class="button is-primary">Like</button>
+                                        </form>
+                                    </div>
+                                    <div th:if="${hasUserLikedAPost.get(post.getId())}">
+                                        <form th:action="@{/posts/{postId}/remove_like(postId=${post.getId()})}" method="post">
+                                            <button type="submit" class="is-warning">Remove Like</button>
+                                        </form>
+                                    </div>
+                                    <div th:if="${post.getUserId().getUsername() == #authentication.getName()}">
+                                        <form th:action="@{/modify_post/{id}(id=${post.getId()})}" method="get">
+                                            <button type="submit" class="button is-primary">Edit</button>
+                                        </form>
+                                    </div>
+                                    <form th:action="@{/posts/{id}/create_comment(id=${post.getId()})}" method="get">
+                                        <button type="submit" class="button is-primary">Comment</button>
+                                    </form>
+                                    <div th:if="${post.getUserId().getUsername() == #authentication.getName()
+                                || #authorization.expression('hasAuthority(''admin'')')}">
+                                        <form th:action="@{/delete_post/{id}(id=${post.getId()})}" method="post">
+                                            <input type="hidden" name="_method" value="DELETE"/>
+                                            <button type="button" class="button is-danger"
+                                                    th:data-id="${post.getId()}"
+                                                    th:onclick="confirmPostDeletion(this.getAttribute('data-id'))">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
 
-        <a th:href="@{/users}">Back to Users</a>
-        <br>
-        <a th:href="@{/}">Back to Home</a>
+                            <hr class="has-background-grey-dark" style="height: 0.5px;">
+
+                            <div th:each="comment : ${post.getComments()}" class="box has-background-dark">
+                                <h2 class="subtitle has-text-light" th:text="${comment.getUserId().getUsername()}"/>
+                                <p class="has-text-light" th:text="${comment.getCommentContent()}"/>
+                                <div th:each="commentImage : ${comment.getCommentImages()}">
+                                    <figure class="image">
+                                        <img th:src="@{/images/comment_image_{id}.jpg(id=${commentImage.getId()})}" alt="Comment image">
+                                    </figure>
+                                </div>
+                                <p class="has-text-light">
+                                    <span th:text="${likesForComments.get(comment.getId())} + ' likes'"/>
+                                </p>
+                                <small class="has-text-grey-light" th:text="${{comment.getCreatedAt()}}"></small>
+                                <div class="buttons">
+                                    <div th:if="${!hasUserLikedAComment.get(comment.getId())}">
+                                        <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
+                                            <form th:action="@{/login}" method="get">
+                                                <button type="submit" class="button is-primary">Like</button>
+                                            </form>
+                                        </div>
+                                        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+                                    && comment.getUserId().getUsername() != #authentication.getName()}">
+                                            <form th:action="@{/comments/{id}/like(id=${comment.getId()})}" method="post">
+                                                <button type="submit" class="button is-primary">Like</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+                                && hasUserLikedAComment.get(comment.getId()) == true}">
+                                        <form th:action="@{/comments/{id}/remove_like(id=${comment.getId()})}" method="post">
+                                            <button type="submit" class="button is-warning">Remove Like</button>
+                                        </form>
+                                    </div>
+                                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+                                    && comment.getUserId().getUsername() == #authentication.getName()}">
+                                        <form th:action="@{/modify_comment/{id}(id=${comment.getId()})}" method="get">
+                                            <button type="submit" class="button is-primary">Edit</button>
+                                        </form>
+                                    </div>
+                                    <small th:text="${{comment.getCreatedAt()}}"/>
+                                    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'
+                                && comment.getUserId().getUsername() == #authentication.getName()}">
+                                        <form th:action="@{/delete_comment/{id}(id=${comment.getId()})}" method="post">
+                                            <input type="hidden" name="_method" value="DELETE"/>
+                                            <button type="button" class="button is-danger" th:data-id="${comment.getId()}"
+                                                    th:onclick="confirmCommentDeletion(this.getAttribute('data-id'))">Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+
+            <div class="buttons">
+                <a th:href="@{/users}" class="button is-link">Back to Users</a>
+                <a th:href="@{/}" class="button is-light">Back to Home</a>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', () =>
+                {
+                    const burger = document.querySelector('.navbar-burger');
+                    const targetId = burger.dataset.target;
+                    const targetElement = document.getElementById(targetId);
+                    burger.addEventListener('click', () =>
+                    {
+                        burger.classList.toggle('is-active');
+                        targetElement.classList.toggle('is-active');
+                    });
+                });
+            </script>
     </body>
 </html>
