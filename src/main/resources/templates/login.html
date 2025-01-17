@@ -1,25 +1,49 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
-    <title>Masterverse - Login</title>
-</head>
-<body>
-<h1>Log into Masterverse</h1>
-<form th:action="@{/login}" method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-    <br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <br>
-    <button type="submit">Login</button>
-</form>
-<form th:action="@{/register}" method="get">
-    <input type="hidden" name="role" value="admin"/>
-    <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
-</form>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+        <title>Masterverse - Login</title>
+    </head>
+    <body style="text-decoration: none;">
+        <section class="hero is-fullheight has-background-dark">
+            <div class="hero-body">
+                <div class="container">
+                    <div class="box" style="max-width: 400px; margin: auto;">
+                        <h1 class="title is-2 has-text-centered has-text-light">Log into Masterverse</h1>
+
+                        <form th:action="@{/login}" method="post">
+                            <div class="field">
+                                <label for="username" class="label has-text-light">Username:</label>
+                                <div class="control">
+                                    <input type="text" id="username" name="username" class="input" required>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="password" class="label has-text-light">Password:</label>
+                                <div class="control">
+                                    <input type="password" id="password" name="password" class="input" required>
+                                </div>
+                            </div>
+                            <div class="field is-grouped is-grouped-centered">
+                                <div class="control">
+                                    <button type="submit" class="button is-primary">Login</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <br>
+
+                        <div class="field has-text-centered">
+                            <div class="control is-flex is-align-items-center is-justify-content-center">
+                                <span class="has-text-light mr-2">Don't have an account?</span>
+                                <a th:href="@{/register}" class="button is-link">Register here</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
 </html>
