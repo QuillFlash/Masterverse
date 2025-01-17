@@ -48,6 +48,11 @@ public class PostsController
         List<Comment> allComments = commentsService.getAllComments();
         Map<String, Object> processedPostData = postDataRequestHelper.processPostsData(allPosts, currentUser);
         Map<String, Object> processedCommentData = commentDataRequestHelper.processCommentsData(allComments, currentUser);
+        if (currentUser != null)
+        {
+            long loggedInUserId = currentUser.getId();
+            model.addAttribute("loggedInUserId", loggedInUserId);
+        }
         model.addAttribute("posts", allPosts);
         model.addAttribute("postImages", processedPostData.get("postImages"));
         model.addAttribute("likesForAllPosts", processedPostData.get("likesForPosts"));

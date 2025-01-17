@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Masterverse - Users You Follow</title>
+    </head>
+    <body>
+    <div th:if="${#authentication == null || #authentication.principal == 'anonymousUser'}">
+        <form th:action="@{/login}" method="get" style="display: inline;">
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/logout}" method="get" style="display: inline;">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+
+    <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
+        <form th:action="@{/register_admin}" method="get">
+            <input type="hidden" name="role" value="admin"/>
+            <button type="submit">Register an Admin</button>
+        </form>
+    </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/followers/{id}(id=${loggedInUserId})}" method="get" style="display: inline;">
+            <button type="submit">Your Followers</button>
+        </form>
+    </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/followed_users/{id}(id=${loggedInUserId})}" method="get" style="display: inline;">
+            <button type="submit">Your Follows</button>
+        </form>
+    </div>
+
+    <h1>Your Follows</h1>
+    <ul>
+        <li th:each="followedUser : ${following}">
+            <a th:href="@{/users/{id}/profile(id=${followedUser.getId()})}" th:text="${followedUser.getUsername()}"></a>
+        </li>
+    </ul>
+    </body>
+</html>

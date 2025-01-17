@@ -17,6 +17,18 @@
         </form>
     </div>
 
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/followers/{id}(id=${loggedInUser})}" method="get" style="display: inline;">
+            <button type="submit">Your Followers</button>
+        </form>
+    </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/followed_users/{id}(id=${loggedInUser})}" method="get" style="display: inline;">
+            <button type="submit">Your Follows</button>
+        </form>
+    </div>
+
     <div th:if="${#authorization.expression('hasAuthority(''admin'')')}">
         <form th:action="@{/register_admin}" method="get">
             <input type="hidden" name="role" value="admin"/>

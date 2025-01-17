@@ -2,6 +2,7 @@ package org.keretrendszer.beadando.masterverse.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.CommentDataRequestHelper;
+import org.keretrendszer.beadando.masterverse.db_read_helpers.FollowTrackingHelper;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.PostDataRequestHelper;
 import org.keretrendszer.beadando.masterverse.db_read_helpers.ValidationHelper;
 import org.keretrendszer.beadando.masterverse.model.Comment;
@@ -9,10 +10,7 @@ import org.keretrendszer.beadando.masterverse.model.Posts;
 import org.keretrendszer.beadando.masterverse.model.Roles;
 import org.keretrendszer.beadando.masterverse.model.Users;
 import org.keretrendszer.beadando.masterverse.security.MasterverseUserDetails;
-import org.keretrendszer.beadando.masterverse.service.CommentsService;
-import org.keretrendszer.beadando.masterverse.service.PostsService;
-import org.keretrendszer.beadando.masterverse.service.RolesService;
-import org.keretrendszer.beadando.masterverse.service.UsersService;
+import org.keretrendszer.beadando.masterverse.service.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,14 +32,14 @@ public class UsersController
     private final PasswordEncoder passwordEncoder;
     private final CommentsService commentsService;
     private final CommentDataRequestHelper commentDataRequestHelper;
+    private final FollowTrackingHelper followTrackingHelper;
+    private final FollowFlowService followFlowService;
 
-    public UsersController(UsersService usersService,
-                           RolesService rolesService,
-                           PostsService postsService,
-                           PostDataRequestHelper postDataRequestHelper,
-                           PasswordEncoder passwordEncoder,
-                           CommentsService commentsService,
-                           CommentDataRequestHelper commentDataRequestHelper)
+    public UsersController(UsersService usersService, RolesService rolesService,
+                           PostsService postsService, PostDataRequestHelper postDataRequestHelper,
+                           PasswordEncoder passwordEncoder, CommentsService commentsService,
+                           CommentDataRequestHelper commentDataRequestHelper,
+                           FollowTrackingHelper followTrackingHelper, FollowFlowService followFlowService)
     {
         this.usersService = usersService;
         this.rolesService = rolesService;
@@ -50,6 +48,8 @@ public class UsersController
         this.passwordEncoder = passwordEncoder;
         this.commentsService = commentsService;
         this.commentDataRequestHelper = commentDataRequestHelper;
+        this.followTrackingHelper = followTrackingHelper;
+        this.followFlowService = followFlowService;
     }
 
     @GetMapping("/login")
@@ -59,10 +59,13 @@ public class UsersController
     }
 
     @GetMapping("/users")
-    public String listUsers(Model model)
+    public String listUsers(Model model,
+                            @AuthenticationPrincipal MasterverseUserDetails currentUser)
     {
         List<Users> allUsers = usersService.getAllUsers();
+        long loggedInUser = currentUser.getId();
         model.addAttribute("users", allUsers);
+        model.addAttribute("loggedInUser", loggedInUser);
         return "users";
     }
 
@@ -77,6 +80,8 @@ public class UsersController
         List<Comment> comments = commentsService.getAllComments();
         Map<String, Object> processedPostData = postDataRequestHelper.processPostsData(userPosts, currentUser);
         Map<String, Object> processedCommentData = commentDataRequestHelper.processCommentsData(comments, currentUser);
+        long followerCount = followFlowService.countFollowers(id);
+        model.addAttribute("followerCount", followerCount);
         model.addAttribute("user", user);
         model.addAttribute("posts", userPosts);
         model.addAttribute("postImages", processedPostData.get("postImages"));
@@ -89,9 +94,16 @@ public class UsersController
         if (currentUser != null)
         {
             Users loggedInUser = usersService.getUserByUsername(currentUser.getUsername());
+            Map<String, Object> followData = followTrackingHelper.processFollowData(id, currentUser);
+            model.addAttribute("followerCount", followData.get("followerCount"));
+            model.addAttribute("isUserFollowingOthers", followData.get("isUserFollowingOthers"));
             model.addAttribute("currentUser", loggedInUser);
         }
-        else model.addAttribute("currentUser", null);
+        else
+        {
+            model.addAttribute("currentUser", null);
+            model.addAttribute("followerCount", null);
+        }
         return "profile";
     }
 
@@ -116,6 +128,30 @@ public class UsersController
     {
         model.addAttribute("user", new Users());
         return "register_admin";
+    }
+
+    @GetMapping("/followers/{id}")
+    public String showFollowersForm(@PathVariable long id,
+                                    Model model,
+                                    @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    {
+        List<Users> followers = followFlowService.getFollowersFromDatabase(id);
+        long loggedInUserId = currentUser.getId();
+        model.addAttribute("followers", followers);
+        model.addAttribute("loggedInUserId", loggedInUserId);
+        return "followers";
+    }
+
+    @GetMapping("/followed_users/{id}")
+    public String showFollowedUsersForm(@PathVariable long id,
+                                        Model model,
+                                        @AuthenticationPrincipal MasterverseUserDetails currentUser)
+    {
+        List<Users> following = followFlowService.getFollowingFromDatabase(id);
+        long loggedInUserId = currentUser.getId();
+        model.addAttribute("following", following);
+        model.addAttribute("loggedInUserId", loggedInUserId);
+        return "followed_users";
     }
 
     @GetMapping("/modify_user/{user_id}")

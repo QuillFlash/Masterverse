@@ -29,6 +29,18 @@
     </div>
 
     <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/followers/{id}(id=${loggedInUserId})}" method="get" style="display: inline;">
+            <button type="submit">Your Followers</button>
+        </form>
+    </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+        <form th:action="@{/followed_users/{id}(id=${loggedInUserId})}" method="get" style="display: inline;">
+            <button type="submit">Your Follows</button>
+        </form>
+    </div>
+
+    <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
         <form th:action="@{/create_post}" method="get" style="display: inline;">
             <button type="submit">Post something</button>
         </form>

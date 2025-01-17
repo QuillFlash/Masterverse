@@ -21,6 +21,18 @@
         </div>
 
         <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+            <form th:action="@{/followers/{id}(id=${currentUser.getId()})}" method="get" style="display: inline;">
+                <button type="submit">Your Followers</button>
+            </form>
+        </div>
+
+        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+            <form th:action="@{/followed_users/{id}(id=${currentUser.getId()})}" method="get" style="display: inline;">
+                <button type="submit">Your Follows</button>
+            </form>
+        </div>
+
+        <div th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
             <form th:action="@{/create_post}" method="get" style="display: inline;">
                 <button type="submit">Post something</button>
             </form>
@@ -35,6 +47,21 @@
 
         <h1 th:text="${user.getUsername()}"/>
         <small th:text="'Account created at: ' + ${{user.getCreatedAt()}}"/>
+        <br>
+        <small th:text="'Follower count: ' + ${{followerCount}}"/>
+        <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser'
+        && !isUserFollowingOthers}">
+            <form th:action="@{/users/{id}/follow(id=${user.getId()})}" method="post">
+                <button type="submit">Follow</button>
+            </form>
+        </div>
+
+        <div th:if="${currentUser != null && #authentication.principal != 'anonymousUser'
+        && isUserFollowingOthers}">
+            <form th:action="@{/users/{id}/unfollow(id=${user.getId()})}" method="post">
+                <button type="submit">Unfollow</button>
+            </form>
+        </div>
 
         <h2>Posts</h2>
         <ul>
@@ -116,8 +143,7 @@
                     && comment.getUserId().getUsername() == #authentication.getName()}">
                         <form th:action="@{/delete_comment/{id}(id=${comment.getId()})}" method="post">
                             <input type="hidden" name="_method" value="DELETE"/>
-                            <button type="button" th:data-id="${comment.getId()
-                            || #authorization.expression('hasAuthority(''admin'')')}"
+                            <button type="button" th:data-id="${comment.getId()}"
                                     th:onclick="confirmCommentDeletion(this.getAttribute('data-id'))">Delete
                             </button>
                         </form>

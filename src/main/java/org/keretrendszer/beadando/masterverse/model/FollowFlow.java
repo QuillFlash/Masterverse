@@ -30,6 +30,12 @@ public class FollowFlow
 
     public FollowFlow() {}
 
+    public FollowFlow(Users follower, Users followed)
+    {
+        this.follower = follower;
+        this.followed = followed;
+    }
+
     public long getId()
     {
         return id;
